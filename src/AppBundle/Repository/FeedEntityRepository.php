@@ -10,4 +10,14 @@ namespace AppBundle\Repository;
  */
 class FeedEntityRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function findWithLimitAndOffset(int $limit, int $offset)
+    {
+        return $this->getEntityManager()
+            ->getRepository('AppBundle\Entity\FeedEntity')->findBy([],['pubDate' => 'DESC'], $limit, $offset);
+    }
+
+    public function truncate()
+    {
+        return $this->em->createQuery('DELETE FROM AppBundle:FeedEntity')->execute();
+    }
 }

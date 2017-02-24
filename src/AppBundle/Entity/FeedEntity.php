@@ -2,33 +2,61 @@
 
 namespace AppBundle\Entity;
 
-use FeedIo\Feed;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * FeedEntity
+ * @ORM\Entity
+ * @ORM\Table(name="feed")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\FeedEntityRepository")
  */
-class FeedEntity extends Feed
+class FeedEntity
 {
     /**
-     * @var int
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
-     * Get id
-     *
-     * @return int
+     * @ORM\Column(type="string", length=255, nullable=false)
+     * @Assert\NotBlank()
      */
-    public function getId()
-    {
-        return $this->id;
-    }
+    protected $guid;
 
     /**
-     * @param int $id
+     * @ORM\Column(type="string", length=50, nullable=false)
+     * @Assert\NotBlank()
      */
-    public function setId(int $id)
-    {
-        $this->id = $id;
-    }
+    protected $category;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=false)
+     * @Assert\NotBlank()
+     */
+    protected $title;
+
+    /**
+     * @ORM\Column(type="text", nullable=false)
+     * @Assert\NotBlank()
+     */
+    protected $description;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=false)
+     * @Assert\NotBlank()
+     */
+    protected $pubDate;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=false)
+     * @Assert\NotBlank()
+     */
+    protected $link;
+
+    /**
+     * @OneToOne(targetEntity="MediaEntity")
+     * @JoinColumn(name="media_id", onDelete="CASCADE", referencedColumnName="id")
+     */
+    protected $media;
 }

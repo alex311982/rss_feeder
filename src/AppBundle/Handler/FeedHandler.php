@@ -4,6 +4,7 @@ namespace AppBundle\Handler;
 
 use AppBundle\Entity\FeedEntity;
 use Doctrine\ORM\EntityManager;
+use FeedIo\Feed;
 use FeedIo\FeedIo;
 
 class FeedHandler implements HandlerInterface
@@ -33,14 +34,17 @@ class FeedHandler implements HandlerInterface
      */
     public function getLastFeeds(string $url, int $count = 10)
     {
-        //TODO - перенести в репозиторий
-        $this->em->createQuery('DELETE FROM AppBundle:FeedEntity')->execute();
-
-        $feed = $this->feedParser->read($url, new FeedEntity)->getFeed();
+        $feed = $this->feedParser->read($url, new Feed)->getFeed();
 
         $this->em->persist($feed);
 
         foreach($feed as $i => $item) {
+
+            if ($item->hasMedia()) {
+                $media = $item->getMedias()->current();
+
+            }
+
             $this->em->persist($item);
 
             if ($count === $i+1 )
@@ -48,5 +52,10 @@ class FeedHandler implements HandlerInterface
         }
 
         $this->em->flush();
+    }
+
+    protected function feedToEntityConverter(Feed $feed): FeedEntity
+    {
+
     }
 }
