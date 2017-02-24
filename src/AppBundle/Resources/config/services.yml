@@ -1,0 +1,5 @@
+services:
+
+    feed.handler:
+        class: AppBundle\Handler\FeedHandler
+        arguments: ["@feedio", "@doctrine.orm.entity_manager"]
