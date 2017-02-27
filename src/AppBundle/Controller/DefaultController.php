@@ -15,9 +15,6 @@ class DefaultController extends Controller
      */
     protected $feedHandler;
 
-    /**
-     * @Route("/", name="homepage")
-     */
     public function indexAction(Request $request)
     {
         // replace this example code with whatever you need

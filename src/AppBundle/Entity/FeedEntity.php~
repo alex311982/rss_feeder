@@ -45,11 +45,8 @@ class FeedEntity
     protected $description;
 
     /**
-     *
-     * @var datetime $created
-     *
-     * @ORM\Column(type="datetime")
-     * @Assert\NotNull()
+     * @ORM\Column(type="string", length=50, nullable=false)
+     * @Assert\NotBlank()
      */
     protected $pubDate;
 
@@ -73,25 +70,6 @@ class FeedEntity
      * @ORM\Column(type="datetime")
      */
     protected $created;
-
-    /**
-     * FeedEntity constructor.
-     * @param $guid
-     * @param $category
-     * @param $title
-     * @param $description
-     * @param $pubDate
-     * @param $link
-     */
-    public function __construct($guid, $category, $title, $description, $pubDate, $link)
-    {
-        $this->guid = $guid;
-        $this->category = $category;
-        $this->title = $title;
-        $this->description = $description;
-        $this->pubDate = $pubDate;
-        $this->link = $link;
-    }
 
     /**
      * Get id
@@ -269,29 +247,5 @@ class FeedEntity
     public function getMedia()
     {
         return $this->media;
-    }
-
-    /**
-     * Set created
-     *
-     * @param \DateTime $created
-     *
-     * @return FeedEntity
-     */
-    public function setCreated($created)
-    {
-        $this->created = $created;
-
-        return $this;
-    }
-
-    /**
-     * Get created
-     *
-     * @return \DateTime
-     */
-    public function getCreated()
-    {
-        return $this->created;
     }
 }
