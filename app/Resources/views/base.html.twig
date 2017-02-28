@@ -6,6 +6,7 @@
         {% block javascripts_head %}
             <script src="js/jquery.js"></script>
             <script src="js/handlebars-v4.0.5.js"></script>
+            <script src="js/custom/ajax_wrapper.js"></script>
         {% endblock %}
         {% block stylesheets %}
             <!-- Bootstrap Core CSS -->
@@ -19,6 +20,8 @@
     <body>
     <!-- Page Content -->
     <div class="container">
+
+        <div id="alert" class="alert alert-danger"></div>
 
         <div class="row">
 

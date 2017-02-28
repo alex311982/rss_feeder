@@ -6,9 +6,62 @@
     {{ parent() }}
 
     <script>
+        function more() {}
+        more.offset = 0;
+
         $(document).ready(function() {
-            var source = $("#news").html();
-            var template = Handlebars.compile(source);
+            var template;
+            var init = function (done, error) {
+                if (!$.isFunction(done)) {
+                    done = function (resolvedData) {
+                        var source = $("#news").html();
+                        if (!template) {
+                            template = Handlebars.compile(source);
+                        }
+                        if ($.isPlainObject(resolvedData)
+                            && "news" in resolvedData
+                        ) {
+                            $("#main_news").append(template(resolvedData));
+                        }
+                        if (resolvedData.count >= resolvedData.total) {
+                            $("#more").hide();
+                        }
+                        more.offset = data.count;
+                    };
+                }
+                if (!$.isFunction(error)) {
+                    error = function (jqXHR, textStatus) {
+                        $("#error").html("Error from server with status " + textStatus);
+                    };
+                }
+                return {
+                    process: function(processData) {
+                        ajaxWrapper.syncRequest({{ sync_url }}, {{ format }}, processData, done, error);
+                    }
+                }
+            };
+
+            init().process({offset:more.offset});
+
+            $("#more").click(
+
+                function () {
+                    return function (more.offset) {
+                        init().process({offset:more.offset}))
+                    };
+                } (more.offset)
+
+
+
+                init().process({offset:more.offset}));
+
+
+
+
+
+
+
+
 
             var data = {
                 news: [{
@@ -18,10 +71,11 @@
                     title: "Front End Technical Lead",
                     description: "<![CDATA[Российского волейболиста австрийского клуба «Хипо Тироль» Станислава Маслиева дисквалифицировали на четыре года за употребление допинга. Проба была взята 9 ноября прошлого года после матча квалификации Лиги чемпионов с «Хапоэлем» из Мате-Ашеры. В крови спортсмена обнаружили следы стероида станозолола.]]>",
                     lastModified: "Thu, 23 Feb 2017 20:13:00 +0300",
-                }]
+                }
+                ],
+                count: 40,
+                total: 50
             };
-
-            $("#main_news").append(template(data));
         });
     </script>
 {% endblock %}
@@ -46,7 +100,7 @@
     </script>
 
     <!-- Pager -->
-    <button class="more btn btn-primary btn-block">
+    <button id="more" class="more btn btn-primary btn-block">
         More <span class="caret"></span>
     </button>
     {% endverbatim %}
