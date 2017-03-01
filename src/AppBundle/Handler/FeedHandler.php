@@ -4,9 +4,14 @@ namespace AppBundle\Handler;
 
 use AppBundle\Entity\FeedEntity;
 use AppBundle\Entity\MediaEntity;
+use AppBundle\Exception\FeederException;
 use Doctrine\ORM\EntityManager;
+use Exception;
+use FeedIo\Adapter\NotFoundException;
+use FeedIo\Adapter\ServerErrorException;
 use FeedIo\Feed;
 use FeedIo\Feed\Item;
+use FeedIo\FeedInterface;
 use FeedIo\FeedIo;
 
 class FeedHandler implements HandlerInterface
@@ -32,11 +37,21 @@ class FeedHandler implements HandlerInterface
     /**
      * @param string $url
      * @param int $count
-     *
+     * @throws Exception
      */
-    public function getLastFeeds(string $url, int $count = 10)
+    public function getLastFeeds(string $url, int $count)
     {
-        $feed = $this->feedParser->read($url)->getFeed();
+        try {
+            $feed = $this->getFeeds($url);
+        } catch (Exception $e) {
+            throw new FeederException($e->getMessage());
+        }
+
+        $count > 0  ? : $count = 50;
+        
+        $this->em->getRepository('AppBundle:FeedEntity')->truncate();
+        $this->em->getRepository('AppBundle:MediaEntity')->truncate();
+
         foreach($feed as $i => $item) {
             $feedEntity = $this->feedToEntityTransformer($item);
             if ($item->hasMedia()) {
@@ -45,11 +60,24 @@ class FeedHandler implements HandlerInterface
                 $feedEntity->setMedia($mediaEntity);
             }
             $this->em->persist($feedEntity);
-            if ($count === $i+1 )
+
+            if ($count === $i+1 ) {
                 break;
+            }
         }
 
         $this->em->flush();
+    }
+
+    protected function getFeeds(string $url): FeedInterface
+    {
+        try {
+            return $this->feedParser->read($url)->getFeed();
+        } catch (NotFoundException $e) {
+            throw new Exception('Server is not found');
+        } catch (ServerErrorException $e) {
+            throw new Exception('Server error');
+        }
     }
 
     protected function feedToEntityTransformer(Item $feed): FeedEntity

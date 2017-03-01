@@ -9,6 +9,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 /**
  * @ORM\Entity
  * @ORM\Table(name="media")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\MediaEntityRepository")
  */
 class MediaEntity
 {

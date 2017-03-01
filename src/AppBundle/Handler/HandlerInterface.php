@@ -13,5 +13,5 @@ interface HandlerInterface
      * @param int $count
      *
      */
-    public function getLastFeeds(string $url, int $count = 10);
+    public function getLastFeeds(string $url, int $count);
 }
