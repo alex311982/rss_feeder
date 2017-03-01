@@ -10,7 +10,7 @@ namespace AppBundle\Repository;
  */
 class FeedEntityRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function findWithLimitAndOffset(int $limit, int $offset)
+    public function findWithLimitAndOffset(int $offset, int $limit)
     {
         return $this->findBy([],['pubDate' => 'DESC'], $limit, $offset);
     }

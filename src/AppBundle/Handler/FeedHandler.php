@@ -5,6 +5,7 @@ namespace AppBundle\Handler;
 use AppBundle\Entity\FeedEntity;
 use AppBundle\Entity\MediaEntity;
 use AppBundle\Exception\FeederException;
+use AppBundle\Repository\FeedEntityRepository;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use FeedIo\Adapter\NotFoundException;
@@ -19,19 +20,36 @@ class FeedHandler implements HandlerInterface
     /**
      * @var FeedIo
      */
-    private $feedParser;
+    protected $feedParser;
     /**
      * @var EntityManager
      */
-    private $em;
+    protected $em;
+    /**
+     * @var int
+     */
+    protected $frontLimit;
+    /**
+     * @var int
+     */
+    protected $curlLimit;
+    /**
+     * @var array
+     */
+    protected $feeds;
 
     public function __construct(
         FeedIo $feedParser,
-        EntityManager $em
+        EntityManager $em,
+        int $frontLimit,
+        int $curlLimit
     )
     {
         $this->feedParser = $feedParser;
         $this->em = $em;
+        $this->frontLimit = $frontLimit;
+        $this->curlLimit = $curlLimit;
+        $this->feeds = [];
     }
 
     /**
@@ -42,15 +60,15 @@ class FeedHandler implements HandlerInterface
     public function getLastFeeds(string $url, int $count)
     {
         try {
-            $feed = $this->getFeeds($url);
+            $feed = $this->process($url);
         } catch (Exception $e) {
             throw new FeederException($e->getMessage());
         }
 
-        $count > 0  ? : $count = 50;
+        $count > 0  ? : $count = $this->curlLimit;
         
-        $this->em->getRepository('AppBundle:FeedEntity')->truncate();
-        $this->em->getRepository('AppBundle:MediaEntity')->truncate();
+        $this->getRepository('AppBundle:FeedEntity')->truncate();
+        $this->getRepository('AppBundle:MediaEntity')->truncate();
 
         foreach($feed as $i => $item) {
             $feedEntity = $this->feedToEntityTransformer($item);
@@ -69,17 +87,61 @@ class FeedHandler implements HandlerInterface
         $this->em->flush();
     }
 
-    protected function getFeeds(string $url): FeedInterface
+    /**
+     * @param int $offset
+     * @return array
+     * @throws FeederException
+     */
+    public function getFeedsByOffset(int $offset): array
+    {
+        if ($this->feeds) {
+            return $this->feeds;
+        }
+
+        /** @var FeedEntityRepository $feedRepository */
+        $feedRepository = $this->getRepository('AppBundle:FeedEntity');
+        try {
+            $feeds = $feedRepository->findWithLimitAndOffset($offset, $this->frontLimit);
+        } catch (Exception $e) {
+            throw new FeederException(FeederException::ORM_ERROR_MSG);
+        }
+
+        /** @var FeedEntity $feed */
+        foreach($feeds as $feed) {
+            array_push($this->feeds, $feed->toArray());
+        }
+
+        return $this->feeds;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFeeds(): array
+    {
+        return $this->feeds;
+    }
+
+    /**
+     * @param string $url
+     * @return FeedInterface
+     * @throws Exception
+     */
+    protected function process(string $url): FeedInterface
     {
         try {
             return $this->feedParser->read($url)->getFeed();
         } catch (NotFoundException $e) {
-            throw new Exception('Server is not found');
+            throw new Exception(FeederException::SERVER_NOT_FOUND_ERROR_MSG);
         } catch (ServerErrorException $e) {
-            throw new Exception('Server error');
+            throw new Exception(FeederException::SERVER_ERROR_MSG);
         }
     }
 
+    /**
+     * @param Item $feed
+     * @return FeedEntity
+     */
     protected function feedToEntityTransformer(Item $feed): FeedEntity
     {
         $category = $feed->getCategories()->current()->getLabel() ? : null;
@@ -94,6 +156,10 @@ class FeedHandler implements HandlerInterface
         );
     }
 
+    /**
+     * @param Item $item
+     * @return MediaEntity
+     */
     protected function mediaToEntityTransformer(Item $item): MediaEntity
     {
         $media = $item->getMedias()->current();
@@ -103,5 +169,14 @@ class FeedHandler implements HandlerInterface
             $media->getUrl(),
             $media->getLength()
         );
+    }
+
+    /**
+     * @param string $metaName
+     * @return \Doctrine\ORM\EntityRepository
+     */
+    protected function getRepository(string $metaName):\Doctrine\ORM\EntityRepository
+    {
+        return $this->em->getRepository($metaName);
     }
 }

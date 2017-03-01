@@ -33,6 +33,12 @@ class FeedEntity
     protected $category;
 
     /**
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Gedmo\Slug(fields={"name"}, updatable=false)
+     */
+    protected $slug;
+
+    /**
      * @ORM\Column(type="string", length=255, nullable=false)
      * @Assert\NotBlank()
      */
@@ -46,7 +52,7 @@ class FeedEntity
 
     /**
      *
-     * @var datetime $created
+     * @var \DateTime $created
      *
      * @ORM\Column(type="datetime")
      * @Assert\NotNull()
@@ -67,7 +73,7 @@ class FeedEntity
 
     /**
      *
-     * @var datetime $created
+     * @var \DateTime $created
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -125,6 +131,22 @@ class FeedEntity
     public function getGuid()
     {
         return $this->guid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * @param string $slug
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
     }
 
     /**
@@ -293,5 +315,27 @@ class FeedEntity
     public function getCreated()
     {
         return $this->created;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray():array
+    {
+        $properties = get_object_vars($this);
+
+        foreach( $properties as $name => $property ) {
+            if ( $property instanceof \DateTime ) {
+                $properties[$name] = $property->format(\DateTime::ATOM);
+            }
+        }
+
+        $properties['media'] = [];
+
+        if ($media = $this->getMedia()) {
+            $properties['media'] = $media->toArray();
+        }
+
+        return $properties;
     }
 }

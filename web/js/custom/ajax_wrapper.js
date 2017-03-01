@@ -1,32 +1,40 @@
 $(document).ready(function() {
-    function ajaxWrapper() {}
+    function ajaxManager() {
+        var url, dataType, data, done, error;
 
-    ajaxWrapper.syncRequest = function(url, dataType, data, done, error) {
-        if (!$.isFunction(done)) {
-            done = function (data) {};
+        function init(url, dataType, done, error) {
+            if (!$.isFunction(done)) {
+                done = function (data) {};
+            }
+            if (!$.isFunction(error)) {
+                error = function (jqXHR, textStatus) {};
+            }
+            if (!url) {
+                error('Url is not setup for AJAX request');
+            }
+            dataType = dataType || 'json';
         }
-        if (!$.isFunction(error)) {
-            error = function (jqXHR, textStatus) {};
+        function send(data) {
+            data = data || {};
+            var request = $.ajax({
+                url: url,
+                type: "GET",
+                data: data,
+                dataType: dataType
+            });
+
+            request.done(function(msg) {
+                done(msg);
+            });
+
+            request.fail(function(jqXHR, textStatus) {
+                done(jqXHR, textStatus);
+            });
         }
-        if (!url) {
-            error('Url is not setup for AJAX request');
+
+        return {
+            init: init,
+            send: send
         }
-        dataType = dataType || 'json';
-        data = data || {};
-
-        var request = $.ajax({
-            url: url,
-            type: "GET",
-            data: data,
-            dataType: dataType
-        });
-
-        request.done(function(msg) {
-            done(msg);
-        });
-
-        request.fail(function(jqXHR, textStatus) {
-            done(jqXHR, textStatus);
-        });
     }
 });

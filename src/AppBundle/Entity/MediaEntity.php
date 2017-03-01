@@ -40,7 +40,7 @@ class MediaEntity
 
     /**
      *
-     * @var datetime $created
+     * @var \DateTime $created
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -164,5 +164,13 @@ class MediaEntity
     public function getCreated()
     {
         return $this->created;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray():array
+    {
+        return get_object_vars($this);
     }
 }

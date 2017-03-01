@@ -69,3 +69,8 @@ stof_doctrine_extensions:
     orm:
         default:
             timestampable: true
+            sluggable: true
+
+rss_feader:
+    per_frontend_request: 10
+    pre_curl_request: 50

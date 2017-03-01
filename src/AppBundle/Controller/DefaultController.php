@@ -2,24 +2,19 @@
 
 namespace AppBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends Controller
 {
-    /**
-     * @var $feedHandler FeedHandler
-     *
-     * @DI\Inject("feed_handler")
-     */
-    protected $feedHandler;
-
     public function indexAction(Request $request)
     {
-        // replace this example code with whatever you need
-        return $this->render('default/index.html.twig', array(
-            'base_dir' => realpath($this->container->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
-        ));
+        $news = $this->redirect($this->generateUrl('AJAX_feeds', array('request' => $request)), 301);
+
+        return $this->render('default/index.html.twig', [
+            'news' => $news->getContent(),
+            'ajax_url' => $this->generateUrl('AJAX_feeds'),
+            'format' => 'json'
+        ]);
     }
 }

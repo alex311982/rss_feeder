@@ -22,5 +22,8 @@ class AppExtension extends Extension
             new FileLocator(__DIR__.'/../Resources/config')
         );
         $loader->load('services.yml');
+
+        $container->setParameter('rss_feeder.limit_frontend', $config['per_frontend_request']);
+        $container->setParameter('rss_feeder.limit_curl', $config['pre_curl_request']);
     }
 }
