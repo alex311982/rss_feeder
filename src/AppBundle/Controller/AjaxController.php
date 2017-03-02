@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Exception\FeederException;
 use AppBundle\Handler\FeedHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,11 +18,19 @@ class AjaxController extends Controller
      */
     protected $feedHandler;
 
-    public function indexAction(Request $request):Response
+    public function indexAction(Request $request): Response
     {
-        $feeds = $this->feedHandler->getFeedsByOffset($request->query->get('offset'));
-
+        try {
+            $data = $this->feedHandler->getFeedsByOffset($request->query->get('offset'));
+            $count = count($data);
+            $total = $this->feedHandler->getFeedsCount([
+                'category_slug' => $request->query->get('category_slug')
+            ]);
+        } catch (FeederException $e) {
+            $error = $e->getMessage();
+        }
         $response = new JsonResponse();
-        return $response->setData($feeds);
+
+        return $response->setData(compact('data', 'count', 'total', 'error'));
     }
 }

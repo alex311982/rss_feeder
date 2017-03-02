@@ -1,11 +1,14 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Welcome!</title>
 
-{% block title %}RSS feeds{% endblock %}
-
-{% block javascripts_head %}
-    {{ parent() }}
-
-    <script>
+            <script src="js/jquery.js"></script>
+            <script src="js/handlebars-v4.0.5.js"></script>
+            <script src="js/custom/ajax_wrapper.js"></script>
+			
+	<script>
     $(document).ready(function() {
         function more() {
             var offset = 0;
@@ -38,13 +41,6 @@
                     ) {
                         $('#main_news').append(template(resolvedData));
                     }
-                    if ($.isPlainObject(resolvedData)
-                        && 'error' in resolvedData
-                    ) {
-                        $('#error').html(resolvedData.error).show();
-                    } else {
-                        $('#error').html('').hide();
-                    }
                     if (resolvedData.count >= resolvedData.total) {
                         $('#more').hide();
                     }
@@ -67,7 +63,6 @@
             }
         };
 
-        $('#error').html('').hide();
         init().process(offsetHandler.getOffset());
 
         $('#more').click(
@@ -93,11 +88,28 @@
 */
         });
     </script>
-{% endblock %}
 
-{% block content %}
-    {% verbatim %}
+            <!-- Bootstrap Core CSS -->
+            <link href="css/bootstrap.min.css" rel="stylesheet">
+            <!-- Custom CSS -->
+            <link href="css/blog-home.css" rel="stylesheet">
 
+    </head>
+
+    <body>
+    <!-- Page Content -->
+    <div class="container">
+
+        <div id="alert" class="alert alert-danger"></div>
+
+        <div class="row">
+
+            <!-- Blog Entries Column -->
+            <div class="col-md-8">
+
+                <h1 class="page-header">
+
+                </h1>
     <div id='main_news'></div>
     <script id='news' type='text/x-handlebars-template'>
         {{#news}}
@@ -119,12 +131,33 @@
     <button id='more' class='more btn btn-primary btn-block'>
         More <span class='caret'></span>
     </button>
+            </div>
 
-    {% endverbatim %}
-{% endblock %}
+            <!-- Blog Sidebar Widgets Column -->
+            <div class="col-md-4">
 
-{#
-{% block sidebar %}
-    {{ render(controller('AppBundle:Category:index')) }}
-{% endblock %}
-#}
+            </div>
+
+        </div>
+        <!-- /.row -->
+
+        <hr>
+
+        <!-- Footer -->
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright &copy; Your Website 2014</p>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+        </footer>
+
+    </div>
+    <!-- /.container -->
+
+        <script src="js/bootstrap.min.js"></script>
+
+    </body>
+</html>

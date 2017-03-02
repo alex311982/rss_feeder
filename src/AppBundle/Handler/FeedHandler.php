@@ -114,6 +114,11 @@ class FeedHandler implements HandlerInterface
         return $this->feeds;
     }
 
+    public function getFeedsCount(array $criteria = [])
+    {
+        return
+    }
+
     /**
      * @return array
      */

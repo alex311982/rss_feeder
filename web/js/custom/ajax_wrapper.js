@@ -1,35 +1,96 @@
-$(document).ready(function() {
-    function ajaxManager() {
-        var url, dataType, data, done, error;
+var test_data = {
+    news: [{
+        media: {
+            link: 'https://lenta.ru/news/2017/02/23/maslievdoping'
+        },
+        title: 'Front End Technical Lead',
+        description: '<![CDATA[Российского волейболиста австрийского клуба «Хипо Тироль» Станислава Маслиева дисквалифицировали на четыре года за употребление допинга. Проба была взята 9 ноября прошлого года после матча квалификации Лиги чемпионов с «Хапоэлем» из Мате-Ашеры. В крови спортсмена обнаружили следы стероида станозолола.]]>',
+        lastModified: 'Thu, 23 Feb 2017 20:13:00 +0300',
+    },
+        {
+            media: {
+                link: 'https://lenta.ru/news/2017/02/23/maslievdoping'
+            },
+            title: 'Front End Technical Lead',
+            description: '<![CDATA[Российского волейболиста австрийского клуба «Хипо Тироль» Станислава Маслиева дисквалифицировали на четыре года за употребление допинга. Проба была взята 9 ноября прошлого года после матча квалификации Лиги чемпионов с «Хапоэлем» из Мате-Ашеры. В крови спортсмена обнаружили следы стероида станозолола.]]>',
+            lastModified: 'Thu, 23 Feb 2017 20:13:00 +0300',
+        },
+        {
+            media: {
+                link: 'https://lenta.ru/news/2017/02/23/maslievdoping'
+            },
+            title: 'Front End Technical Lead',
+            description: '<![CDATA[Российского волейболиста австрийского клуба «Хипо Тироль» Станислава Маслиева дисквалифицировали на четыре года за употребление допинга. Проба была взята 9 ноября прошлого года после матча квалификации Лиги чемпионов с «Хапоэлем» из Мате-Ашеры. В крови спортсмена обнаружили следы стероида станозолола.]]>',
+            lastModified: 'Thu, 23 Feb 2017 20:13:00 +0300',
+        }
+    ],
+    count: 3,
+    total: 2
+};
+
+
+
+function ajaxManager() {
+        var urlAjax, dataTypeAjax, dataAjax, doneCB, errorCB, isInited;
 
         function init(url, dataType, done, error) {
             if (!$.isFunction(done)) {
-                done = function (data) {};
+                doneCB = function (data) {};
+            } else {
+                doneCB = done;
             }
             if (!$.isFunction(error)) {
                 error = function (jqXHR, textStatus) {};
+            } else {
+                errorCB = error;
             }
             if (!url) {
-                error('Url is not setup for AJAX request');
+                errorCB('Url is not setup for AJAX request');
+            } else {
+                urlAjax = url
             }
-            dataType = dataType || 'json';
+            dataTypeAjax = dataType || 'json';
+
+            isInited = true;
         }
+
         function send(data) {
-            data = data || {};
-            var request = $.ajax({
-                url: url,
+
+            if (isInited) {
+                dataAjax = data || {};
+                sendAjax_test();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        function sendAjax() {
+            $.ajax({
+                url: urlAjax,
                 type: "GET",
-                data: data,
-                dataType: dataType
+                data: dataAjax,
+                dataType: dataTypeAjax
             });
 
             request.done(function(msg) {
-                done(msg);
+                doneCB(msg);
             });
 
             request.fail(function(jqXHR, textStatus) {
-                done(jqXHR, textStatus);
+                errorCB(jqXHR, textStatus);
             });
+        }
+
+        function sendAjax_test() {
+            console.log('sendAjax_test');
+            var deferred = $.Deferred();
+
+            deferred.done(doneCB);
+            deferred.fail(errorCB);
+
+            deferred.resolve(test_data);
         }
 
         return {
@@ -37,4 +98,3 @@ $(document).ready(function() {
             send: send
         }
     }
-});

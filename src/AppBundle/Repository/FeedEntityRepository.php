@@ -2,6 +2,8 @@
 
 namespace AppBundle\Repository;
 
+use Doctrine\ORM\Persisters\Entity\EntityPersister;
+
 /**
  * FeedEntityRepository
  *
@@ -19,5 +21,13 @@ class FeedEntityRepository extends \Doctrine\ORM\EntityRepository
     {
         return $this->getEntityManager()
             ->createQuery('DELETE FROM AppBundle:FeedEntity')->execute();
+    }
+
+    public function findCount(array $criteria = [])
+    {
+        /** @var EntityPersister $persister */
+        $persister = $this->_em->getUnitOfWork()->getEntityPersister($this->_entityName);
+
+        return $persister->count($criteria);
     }
 }
