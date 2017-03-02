@@ -6,6 +6,7 @@
     {{ parent() }}
 
     <script>
+    $(document).ready(function() {
         function more() {
             var offset = 0;
 
@@ -22,50 +23,49 @@
             }
         }
 
-        $(document).ready(function() {
-            var template,
-                offsetHandler = more(),
-                ajaxHandler = ajaxManager();
-            var init = function (done, error) {
-                if (!$.isFunction(done)) {
-                    done = function (resolvedData) {
-                        var source = $('#news').html();
-                        if (!template) {
-                            template = Handlebars.compile(source);
-                        }
-                        if ($.isPlainObject(resolvedData)
-                            && 'news' in resolvedData
-                        ) {
-                            $('#main_news').append(template(resolvedData));
-                        }
-                        if (resolvedData.count >= resolvedData.total) {
-                            $('#more').hide();
-                        }
-                        offsetHandler.setOffset(data.count);
-                    };
-                }
-                if (!$.isFunction(error)) {
-                    error = function (jqXHR, textStatus) {
-                        $('#error').html('Error from server with status ' + textStatus);
-                    };
-                }
-                ajaxHandler.init({{ ajax_url }}, {{ format }}, done, error);
-
-                return {
-                    process: function(processData) {
-                        ajaxHandler.send(processData);
+        var template,
+            offsetHandler = more(),
+            ajaxHandler = ajaxManager();
+        var init = function (done, error) {
+            if (!$.isFunction(done)) {
+                done = function (resolvedData) {
+                    var source = $('#news').html();
+                    if (!template) {
+                        template = Handlebars.compile(source);
                     }
-                }
-            };
+                    if ($.isPlainObject(resolvedData)
+                        && 'news' in resolvedData
+                    ) {
+                        $('#main_news').append(template(resolvedData));
+                    }
+                    if (resolvedData.count >= resolvedData.total) {
+                        $('#more').hide();
+                    }
+                    offsetHandler.setOffset(data.count);
+                };
+            }
+            if (!$.isFunction(error)) {
+                error = function (jqXHR, textStatus) {
+                    $('#error').html('Error from server with status ' + textStatus);
+                };
+            }
+            ajaxHandler.init('{{ ajax_url }}', '{{ format }}', done, error);
 
-            init().process(offsetHandler.getOffset());
-
-            $('#more').click(
-                function () {
-                    var count = offsetHandler.getOffset();
-                    init().process({offset : count})
+            return {
+                process: function(processData) {
+                    ajaxHandler.send(processData);
                 }
-            );
+            }
+        };
+
+        init().process(offsetHandler.getOffset());
+
+        $('#more').click(
+            function () {
+                var count = offsetHandler.getOffset();
+                init().process({offset : count})
+            }
+        );
 /*
             var data = {
                 news: [{
@@ -113,6 +113,8 @@
     {% endverbatim %}
 {% endblock %}
 
+{#
 {% block sidebar %}
     {{ render(controller('AppBundle:Category:index')) }}
 {% endblock %}
+#}

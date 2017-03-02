@@ -33,8 +33,8 @@ class FeedEntity
     protected $category;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
-     * @Gedmo\Slug(fields={"name"}, updatable=false)
+     * @ORM\Column(type="string", length=255)
+     * @Gedmo\Slug(fields={"category"}, updatable=false)
      */
     protected $slug;
 

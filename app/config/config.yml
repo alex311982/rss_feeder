@@ -71,6 +71,6 @@ stof_doctrine_extensions:
             timestampable: true
             sluggable: true
 
-rss_feader:
+app:
     per_frontend_request: 10
     pre_curl_request: 50
