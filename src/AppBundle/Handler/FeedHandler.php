@@ -7,14 +7,13 @@ use AppBundle\Entity\MediaEntity;
 use AppBundle\Exception\FeederException;
 use AppBundle\Repository\FeedEntityRepository;
 use Doctrine\ORM\EntityManager;
-use Exception;
 use FeedIo\Adapter\NotFoundException;
 use FeedIo\Adapter\ServerErrorException;
 use FeedIo\Feed\Item;
 use FeedIo\FeedInterface;
 use FeedIo\FeedIo;
 
-class FeedHandler implements HandlerInterface
+class FeedHandler implements FeedHandlerInterface
 {
     /**
      * @var FeedIo
@@ -54,18 +53,12 @@ class FeedHandler implements HandlerInterface
     /**
      * @param string $url
      * @param int $count
-     * @throws Exception
+     * @throws FeederException
      */
     public function getLastFeeds(string $url, int $count)
     {
-        try {
-            $feed = $this->process($url);
-        } catch (Exception $e) {
-            throw new FeederException($e->getMessage());
-        }
-
+        $feed = $this->process($url);
         $count > 0  ? : $count = $this->curlLimit;
-        
         $this->getRepository('AppBundle:FeedEntity')->truncate();
         $this->getRepository('AppBundle:MediaEntity')->truncate();
 
@@ -101,7 +94,7 @@ class FeedHandler implements HandlerInterface
         $feedRepository = $this->getRepository('AppBundle:FeedEntity');
         try {
             $feeds = $feedRepository->findWithLimitAndOffset($offset, $this->frontLimit);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new FeederException(FeederException::ORM_ERROR_MSG);
         }
 
@@ -129,16 +122,16 @@ class FeedHandler implements HandlerInterface
     /**
      * @param string $url
      * @return FeedInterface
-     * @throws Exception
+     * @throws FeederException
      */
     protected function process(string $url): FeedInterface
     {
         try {
             return $this->feedParser->read($url)->getFeed();
         } catch (NotFoundException $e) {
-            throw new Exception(FeederException::SERVER_NOT_FOUND_ERROR_MSG);
+            throw new FeederException(FeederException::SERVER_NOT_FOUND_ERROR_MSG);
         } catch (ServerErrorException $e) {
-            throw new Exception(FeederException::SERVER_ERROR_MSG);
+            throw new FeederException(FeederException::SERVER_ERROR_MSG);
         }
     }
 

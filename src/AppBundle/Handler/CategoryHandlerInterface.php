@@ -3,15 +3,15 @@
 namespace AppBundle\Handler;
 
 /**
- * Interface HandlerInterface
+ * Interface CategoryHandlerInterface
  * @package AppBundle\Handler
  */
-interface HandlerInterface
+interface CategoryHandlerInterface
 {
     /**
      * @param string $url
      * @param int $count
      *
      */
-    public function getLastFeeds(string $url, int $count);
+    public function getCategories();
 }

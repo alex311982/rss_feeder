@@ -3,21 +3,29 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\FeedEntity;
-use AppBundle\Handler\FeedHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends Controller
 {
-    /**
-     * @var $feedHandler FeedHandler
-     *
-     * @DI\Inject("feed_handler")
-     */
-    protected $feedHandler;
-
     public function indexAction(): Response
     {
+        return $this->render('default/categories.html.twig');
+    }
+
+    public function getCategoriesAction(Request $request): Response
+    {
+        $categories = $this->redirect($this->generateUrl('AJAX_categories', array('request' => $request)), 301);
+
+        return $this->render('default/index.html.twig', [
+            'categories' => $categories,
+            'ajax_url' => $this->generateUrl('AJAX_categories'),
+            'format' => 'json'
+        ]);
+
+
+
         $categories = [];
         $news = $this->feedHandler->getFeeds();
 
@@ -29,9 +37,5 @@ class CategoryController extends Controller
             ]);
         }
         $categories = array_unique($categories);
-
-        return $this->render('default/categories.html.twig', [
-            'categories' => $categories
-        ]);
     }
 }
