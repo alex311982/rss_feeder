@@ -8,16 +8,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use JMS\DiExtraBundle\Annotation as DI;
 
 class AjaxController extends Controller
 {
     /**
      * @var $feedHandler FeedHandler
      *
-     * @DI\Inject("feed_handler")
+     * @DI\Inject("feed.handler")
      */
     protected $feedHandler;
 
+    /**
+     * @param Request $request
+     * @return Response
+     */
     public function indexAction(Request $request): Response
     {
         try {

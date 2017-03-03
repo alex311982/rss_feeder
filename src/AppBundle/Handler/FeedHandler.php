@@ -10,7 +10,6 @@ use Doctrine\ORM\EntityManager;
 use Exception;
 use FeedIo\Adapter\NotFoundException;
 use FeedIo\Adapter\ServerErrorException;
-use FeedIo\Feed;
 use FeedIo\Feed\Item;
 use FeedIo\FeedInterface;
 use FeedIo\FeedIo;
@@ -116,7 +115,7 @@ class FeedHandler implements HandlerInterface
 
     public function getFeedsCount(array $criteria = [])
     {
-        return
+        return $this->getRepository('AppBundle:FeedEntity')->findCount($criteria);
     }
 
     /**
