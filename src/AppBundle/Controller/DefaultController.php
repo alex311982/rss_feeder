@@ -9,12 +9,10 @@ class DefaultController extends Controller
 {
     public function indexAction(Request $request)
     {
-        $news = $this->redirect($this->generateUrl('AJAX_feeds', array('request' => $request)), 301);
-
         return $this->render('default/index.html.twig', [
-            'news' => $news->getContent(),
             'ajax_url' => $this->generateUrl('AJAX_feeds'),
-            'format' => 'json'
+            'format' => 'json',
+            'page_header' => 'News'
         ]);
     }
 }

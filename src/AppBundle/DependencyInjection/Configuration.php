@@ -19,7 +19,10 @@ class Configuration implements ConfigurationInterface
             ->integerNode('per_frontend_request')
                 ->defaultValue(10)
             ->end()
-            ->integerNode('pre_curl_request')
+            ->integerNode('per_curl_request')
+                ->defaultValue(10)
+            ->end()
+            ->integerNode('feeds_reader_offset')
                 ->defaultValue(10)
             ->end()
         ->end();

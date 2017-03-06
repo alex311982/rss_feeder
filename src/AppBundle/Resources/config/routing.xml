@@ -8,12 +8,16 @@
         <default key="_controller">AppBundle:Default:index</default>
     </route>
 
-    <route id="AJAX_feeds" path="/ajax">
-        <default key="_controller">AppBundle:Ajax:index</default>
+    <route id="category" path="/category/{slug}">
+        <default key="_controller">AppBundle:Category:category</default>
     </route>
 
-    <route id="category" path="/category/{slug}">
-        <default key="_controller">AppBundle:Default:category</default>
+    <route id="AJAX_feeds" path="/ajax/feeds">
+        <default key="_controller">AppBundle:Ajax:feeds</default>
+    </route>
+
+    <route id="AJAX_categories" path="/ajax/categories">
+        <default key="_controller">AppBundle:Ajax:categories</default>
     </route>
 
 </routes>

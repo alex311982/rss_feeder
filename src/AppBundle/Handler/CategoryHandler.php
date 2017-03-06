@@ -17,37 +17,52 @@ use FeedIo\FeedIo;
 class CategoryHandler implements CategoryHandlerInterface
 {
     /**
-     * @var FeedIo
-     */
-    protected $feedParser;
-    /**
      * @var EntityManager
      */
     protected $em;
     /**
-     * @var int
-     */
-    protected $frontLimit;
-    /**
-     * @var int
-     */
-    protected $curlLimit;
-    /**
      * @var array
      */
-    protected $feeds;
+    protected $categories;
 
-    public function __construct(
-        FeedIo $feedParser,
-        EntityManager $em,
-        int $frontLimit,
-        int $curlLimit
-    )
+    public function __construct(EntityManager $em)
     {
-        $this->feedParser = $feedParser;
         $this->em = $em;
-        $this->frontLimit = $frontLimit;
-        $this->curlLimit = $curlLimit;
-        $this->feeds = [];
+        $this->categories = [];
+    }
+
+    public function getCategories(): array
+    {
+        if ($this->categories) {
+            return $this->categories;
+        }
+
+        /** @var FeedEntityRepository $feedRepository */
+        $feedRepository = $this->getRepository('AppBundle:FeedEntity');
+
+        try {
+            $feeds = $feedRepository->findAll();
+        } catch (\Exception $e) {
+            throw new FeederException(FeederException::ORM_ERROR_MSG);
+        }
+
+        /** @var FeedEntity $feed */
+        foreach ($feeds as $feed) {
+            $this->categories[$feed->getSlug()] = [
+                'name' => $feed->getCategory(),
+                'slug' => $feed->getSlug(),
+            ];
+        }
+
+        return $this->categories;
+    }
+
+    /**
+     * @param string $metaName
+     * @return \Doctrine\ORM\EntityRepository
+     */
+    protected function getRepository(string $metaName):\Doctrine\ORM\EntityRepository
+    {
+        return $this->em->getRepository($metaName);
     }
 }

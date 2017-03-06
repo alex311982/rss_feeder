@@ -106,17 +106,9 @@ class FeedHandler implements FeedHandlerInterface
         return $this->feeds;
     }
 
-    public function getFeedsCount(array $criteria = [])
+    public function getFeedsCount(array $criteria = []): int
     {
         return $this->getRepository('AppBundle:FeedEntity')->findCount($criteria);
-    }
-
-    /**
-     * @return array
-     */
-    public function getFeeds(): array
-    {
-        return $this->feeds;
     }
 
     /**

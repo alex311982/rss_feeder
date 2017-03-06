@@ -73,4 +73,5 @@ stof_doctrine_extensions:
 
 app:
     per_frontend_request: 10
-    pre_curl_request: 50
+    per_curl_request: 50
+    feeds_reader_offset: 0

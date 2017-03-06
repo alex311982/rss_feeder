@@ -24,6 +24,7 @@ class AppExtension extends Extension
         $loader->load('services.yml');
 
         $container->setParameter('rss_feeder.limit_frontend', $config['per_frontend_request']);
-        $container->setParameter('rss_feeder.limit_curl', $config['pre_curl_request']);
+        $container->setParameter('rss_feeder.limit_curl', $config['per_curl_request']);
+        $container->setParameter('rss_feeder.offset', $config['feeds_reader_offset']);
     }
 }

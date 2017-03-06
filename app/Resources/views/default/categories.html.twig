@@ -1,32 +1,32 @@
-<!-- Blog Categories Well -->
 <script>
     $(document).ready(function() {
-        var template,
-            ajaxHandler = ajaxManager();
-        var init = function (done, error) {
+        var categories = function () {};
+
+        categories.init = function (done, error) {
+            var template,
+                ajaxHandler = ajaxManager();
+
             if (!$.isFunction(done)) {
                 done = function (resolvedData) {
-                    var source = $('#news').html();
+                    var source = $('#categories').html();
                     if (!template) {
                         template = Handlebars.compile(source);
                     }
                     if ($.isPlainObject(resolvedData)
-                        && 'news' in resolvedData
+                        && 'data' in resolvedData
                     ) {
-                        $('#main_news').append(template(resolvedData));
+                        $('#categories_list').append(template({
+                            categories: resolvedData.data
+                        }));
                     }
-                    if (resolvedData.count >= resolvedData.total) {
-                        $('#more').hide();
-                    }
-                    offsetHandler.setOffset(data.count);
                 };
             }
             if (!$.isFunction(error)) {
                 error = function (jqXHR, textStatus) {
-                    $('#error').html('Error from server with status ' + textStatus);
+                    $('#alert').html('Error from server with status ' + textStatus);
                 };
             }
-            ajaxHandler.init({{ ajax_url }}, {{ format }}, done, error);
+            ajaxHandler.init('{{ ajax_url }}', '{{ format }}', done, error);
 
             return {
                 process: function(processData) {
@@ -35,14 +35,7 @@
             }
         };
 
-        init().process(offsetHandler.getOffset());
-
-        $('#more').click(
-            function () {
-                var count = offsetHandler.getOffset();
-                init().process({offset : count})
-            }
-        );
+        categories.init().process();
     });
 </script>
 
@@ -50,14 +43,15 @@
     <h4>Blog Categories</h4>
     <div class="row">
         <div class="col-lg-12">
-            <ul class="list-unstyled">
-            {% verbatim %}
-                {{#categories}}
-                    <li><a href="{{ url }}">{{ name }}</a></li>
-                {{/categories}}
-            {% endverbatim %}
-            </ul>
+            <ul id="categories_list" class="list-unstyled"></ul>
         </div>
     </div>
-    <!-- /.row -->
 </div>
+
+<script id='categories' type='text/x-handlebars-template'>
+    {% verbatim %}
+        {{#categories}}
+            <li><a href="{{ url }}">{{ name }}</a></li>
+        {{/categories}}
+    {% endverbatim %}
+</script>

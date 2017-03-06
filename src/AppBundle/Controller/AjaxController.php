@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Exception\FeederException;
+use AppBundle\Handler\CategoryHandler;
 use AppBundle\Handler\FeedHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,21 +21,54 @@ class AjaxController extends Controller
     protected $feedHandler;
 
     /**
+     * @var $categoryHandler CategoryHandler
+     *
+     * @DI\Inject("category.handler")
+     */
+    protected $categoryHandler;
+
+    /**
      * @param Request $request
      * @return Response
      */
-    public function indexAction(Request $request): Response
+    public function feedsAction(Request $request): Response
     {
+        $offset = $request->query->get('offset') ? : $this->getParameter('rss_feeder.offset');
+
         try {
-            $data = $this->feedHandler->getFeedsByOffset($request->query->get('offset'));
+            $data = $this->feedHandler->getFeedsByOffset($offset);
             $count = count($data);
             $total = $this->feedHandler->getFeedsCount([
-                'category_slug' => $request->query->get('category_slug')
+                //'category_slug' => $request->query->get('category_slug')
             ]);
         } catch (FeederException $e) {
             $error = $e->getMessage();
         }
         $response = new JsonResponse();
+
+        return $response->setData(compact('data', 'count', 'total', 'error'));
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    public function categoriesAction(Request $request): Response
+    {
+        try {
+            $data = $this->categoryHandler->getCategories();
+
+            foreach ($data as $key => $category) {
+                $data[$key]['url'] = $this->generateUrl('category', array('slug' => $category['slug']));
+            }
+
+            $total = $count = count($data);
+        } catch (FeederException $e) {
+            $error = $e->getMessage();
+        }
+        $response = new JsonResponse();
+
+        $data = array_values($data);
 
         return $response->setData(compact('data', 'count', 'total', 'error'));
     }

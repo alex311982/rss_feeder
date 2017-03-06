@@ -5,7 +5,7 @@
 {% block javascripts_head %}
     {{ parent() }}
 
-    <script>
+<script>
     $(document).ready(function() {
         function more() {
             var offset = 0;
@@ -14,7 +14,7 @@
                 return offset;
             }
             function setOffset (count) {
-                offset = count;
+                offset += count;
             }
 
             return {
@@ -23,10 +23,13 @@
             }
         }
 
-        var template,
-            offsetHandler = more(),
-            ajaxHandler = ajaxManager();
-        var init = function (done, error) {
+        var feeds = function () {},
+            offsetHandler = more();
+
+        feeds.init = function (done, error) {
+            var template,
+                ajaxHandler = ajaxManager();
+
             if (!$.isFunction(done)) {
                 done = function (resolvedData) {
                     var source = $('#news').html();
@@ -34,26 +37,28 @@
                         template = Handlebars.compile(source);
                     }
                     if ($.isPlainObject(resolvedData)
-                        && 'news' in resolvedData
+                        && 'data' in resolvedData
                     ) {
-                        $('#main_news').append(template(resolvedData));
+                        $('#main_news').append(template({
+                            news: resolvedData.data
+                        }));
                     }
                     if ($.isPlainObject(resolvedData)
                         && 'error' in resolvedData
                     ) {
-                        $('#error').html(resolvedData.error).show();
+                        $('#alert').html(resolvedData.error).show();
                     } else {
-                        $('#error').html('').hide();
-                    }
-                    if (resolvedData.count >= resolvedData.total) {
-                        $('#more').hide();
+                        $('#alert').html('').hide();
                     }
                     offsetHandler.setOffset(resolvedData.count);
+                    if (offsetHandler.getOffset() >= resolvedData.total) {
+                        $('#more').hide();
+                    }
                 };
             }
             if (!$.isFunction(error)) {
                 error = function (jqXHR, textStatus) {
-                    $('#error').html('Error from server with status ' + textStatus).show();
+                    $('#alert').html('Error from server with status ' + textStatus).show();
                 };
             }
             ajaxHandler.init('{{ ajax_url }}', '{{ format }}', done, error);
@@ -61,38 +66,24 @@
             return {
                 process: function(processData) {
                     if (!ajaxHandler.send(processData)) {
-                        $('#error').html('Somethig wrong').show();
+                        $('#alert').html('Somethig wrong').show();
                     }
                 }
             }
         };
 
-        $('#error').html('').hide();
-        init().process(offsetHandler.getOffset());
+        $('#alert').html('').hide();
 
         $('#more').click(
             function () {
                 var count = offsetHandler.getOffset();
-                init().process({offset : count})
+                feeds.init().process({offset : count})
             }
         );
-/*
-            var data = {
-                news: [{
-                    media: {
-                        link: 'https://lenta.ru/news/2017/02/23/maslievdoping'
-                    },
-                    title: 'Front End Technical Lead',
-                    description: '<![CDATA[Российского волейболиста австрийского клуба «Хипо Тироль» Станислава Маслиева дисквалифицировали на четыре года за употребление допинга. Проба была взята 9 ноября прошлого года после матча квалификации Лиги чемпионов с «Хапоэлем» из Мате-Ашеры. В крови спортсмена обнаружили следы стероида станозолола.]]>',
-                    lastModified: 'Thu, 23 Feb 2017 20:13:00 +0300',
-                }
-                ],
-                count: 40,
-                total: 50
-            };
-*/
-        });
-    </script>
+
+        feeds.init().process({offset : offsetHandler.getOffset()});
+    });
+</script>
 {% endblock %}
 
 {% block content %}
@@ -104,14 +95,13 @@
         <h2>
             <a href='{{link}}'>{{title}}</a>
         </h2>
-        <p><span class='glyphicon glyphicon-time'></span>{{lastModified}}</p>
-        <hr>
+        <p><span class='glyphicon glyphicon-time'></span>{{pubDate}}</p>
+
         <img class='img-responsive' src='{{media.url}}' alt=''>
-        <hr>
+
         <p>{{description}}</p>
         <a class='btn btn-primary' href='#'>Read More <span class='glyphicon glyphicon-chevron-right'></span></a>
 
-        <hr>
         {{/news}}
     </script>
 
@@ -121,10 +111,9 @@
     </button>
 
     {% endverbatim %}
+
 {% endblock %}
 
-{#
 {% block sidebar %}
     {{ render(controller('AppBundle:Category:index')) }}
 {% endblock %}
-#}

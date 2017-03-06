@@ -34,7 +34,7 @@ class FeedEntity
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Gedmo\Slug(fields={"category"}, updatable=false)
+     * @Gedmo\Slug(fields={"category"}, updatable=false, unique=false)
      */
     protected $slug;
 

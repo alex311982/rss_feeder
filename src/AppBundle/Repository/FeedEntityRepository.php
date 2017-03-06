@@ -30,4 +30,9 @@ class FeedEntityRepository extends \Doctrine\ORM\EntityRepository
 
         return $persister->count($criteria);
     }
+
+    public function findAll()
+    {
+        return $this->findBy([],['pubDate' => 'DESC']);
+    }
 }

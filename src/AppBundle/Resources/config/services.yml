@@ -3,3 +3,7 @@ services:
     feed.handler:
         class: AppBundle\Handler\FeedHandler
         arguments: ["@feedio", "@doctrine.orm.entity_manager", "%rss_feeder.limit_frontend%", "%rss_feeder.limit_curl%"]
+
+    category.handler:
+            class: AppBundle\Handler\CategoryHandler
+            arguments: ["@doctrine.orm.entity_manager"]
