@@ -36,10 +36,12 @@ class AjaxController extends Controller
         $offset = $request->query->get('offset') ? : $this->getParameter('rss_feeder.offset');
 
         try {
-            $data = $this->feedHandler->getFeedsByOffset($offset);
+            $data = $this->feedHandler->getFeedsByConditions([
+                'slug' => $request->query->get('slug')
+            ], $offset);
             $count = count($data);
             $total = $this->feedHandler->getFeedsCount([
-                //'category_slug' => $request->query->get('category_slug')
+                'slug' => $request->query->get('slug')
             ]);
         } catch (FeederException $e) {
             $error = $e->getMessage();
@@ -55,6 +57,8 @@ class AjaxController extends Controller
      */
     public function categoriesAction(Request $request): Response
     {
+        $data = [];
+
         try {
             $data = $this->categoryHandler->getCategories();
 

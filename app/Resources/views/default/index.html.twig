@@ -24,7 +24,8 @@
         }
 
         var feeds = function () {},
-            offsetHandler = more();
+            offsetHandler = more(),
+            ajaxChannel;
 
         feeds.init = function (done, error) {
             var template,
@@ -50,7 +51,10 @@
                     } else {
                         $('#alert').html('').hide();
                     }
+
                     offsetHandler.setOffset(resolvedData.count);
+                    ajaxHandler.getParameterHandler().addParameter('offset', offsetHandler.getOffset());
+
                     if (offsetHandler.getOffset() >= resolvedData.total) {
                         $('#more').hide();
                     }
@@ -65,23 +69,28 @@
 
             return {
                 process: function(processData) {
-                    if (!ajaxHandler.send(processData)) {
+                    ajaxHandler.getParameterHandler().addParameters(processData);
+
+                    if (!ajaxHandler.send()) {
                         $('#alert').html('Somethig wrong').show();
                     }
                 }
             }
         };
 
-        $('#alert').html('').hide();
+        ajaxChannel = feeds.init();
+
+        $('#main_news').on('categoryClick', function(e, eventInfo) {
+            ajaxChannel.process({slug : eventInfo.category_slug});
+        });
 
         $('#more').click(
             function () {
-                var count = offsetHandler.getOffset();
-                feeds.init().process({offset : count})
+                ajaxChannel.process();
             }
         );
 
-        feeds.init().process({offset : offsetHandler.getOffset()});
+        ajaxChannel.process();
     });
 </script>
 {% endblock %}
@@ -89,7 +98,7 @@
 {% block content %}
     {% verbatim %}
 
-    <div id='main_news'></div>
+    <div id='main_news' class="subscribers-categoryClick"></div>
     <script id='news' type='text/x-handlebars-template'>
         {{#news}}
         <h2>

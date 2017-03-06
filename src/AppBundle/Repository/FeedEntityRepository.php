@@ -12,9 +12,9 @@ use Doctrine\ORM\Persisters\Entity\EntityPersister;
  */
 class FeedEntityRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function findWithLimitAndOffset(int $offset, int $limit)
+    public function findWithLimitAndOffset(array $condtitions = [], int $limit, int $offset)
     {
-        return $this->findBy([],['pubDate' => 'DESC'], $limit, $offset);
+        return $this->findBy($condtitions,['pubDate' => 'DESC'], $limit, $offset);
     }
 
     public function truncate()

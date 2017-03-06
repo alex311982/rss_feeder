@@ -51,6 +51,8 @@ class FeedHandler implements FeedHandlerInterface
     }
 
     /**
+     * Curl request for RSS
+     *
      * @param string $url
      * @param int $count
      * @throws FeederException
@@ -80,11 +82,12 @@ class FeedHandler implements FeedHandlerInterface
     }
 
     /**
-     * @param int $offset
+     * @param array $condtitions
      * @return array
      * @throws FeederException
+     * @internal param int $offset
      */
-    public function getFeedsByOffset(int $offset): array
+    public function getFeedsByConditions(array $condtitions = [], int $offset): array
     {
         if ($this->feeds) {
             return $this->feeds;
@@ -93,7 +96,7 @@ class FeedHandler implements FeedHandlerInterface
         /** @var FeedEntityRepository $feedRepository */
         $feedRepository = $this->getRepository('AppBundle:FeedEntity');
         try {
-            $feeds = $feedRepository->findWithLimitAndOffset($offset, $this->frontLimit);
+            $feeds = $feedRepository->findWithLimitAndOffset($condtitions, $this->frontLimit, $offset);
         } catch (\Exception $e) {
             throw new FeederException(FeederException::ORM_ERROR_MSG);
         }

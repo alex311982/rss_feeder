@@ -1,4 +1,4 @@
-function ajaxManager() {
+function ajaxManager_CP() {
         var urlAjax, dataTypeAjax, dataAjax, doneCB, errorCB, isInited;
 
         function init(url, dataType, done, error) {
