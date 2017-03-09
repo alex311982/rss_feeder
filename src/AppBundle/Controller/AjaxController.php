@@ -36,13 +36,9 @@ class AjaxController extends Controller
         $offset = $request->query->get('offset') ? : $this->getParameter('rss_feeder.offset');
 
         try {
-            $data = $this->feedHandler->getFeedsByConditions([
-                'slug' => $request->query->get('slug')
-            ], $offset);
+            $data = $this->feedHandler->getFeedsByConditions($request->query->all(), $offset);
             $count = count($data);
-            $total = $this->feedHandler->getFeedsCount([
-                'slug' => $request->query->get('slug')
-            ]);
+            $total = $this->feedHandler->getFeedsCount($request->query->all());
         } catch (FeederException $e) {
             $error = $e->getMessage();
         }

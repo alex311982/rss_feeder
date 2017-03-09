@@ -89,6 +89,7 @@ class FeedHandler implements FeedHandlerInterface
      */
     public function getFeedsByConditions(array $condtitions = [], int $offset): array
     {
+        //var_dump($condtitions);exit;
         if ($this->feeds) {
             return $this->feeds;
         }
