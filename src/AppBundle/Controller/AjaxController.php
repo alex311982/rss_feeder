@@ -34,6 +34,7 @@ class AjaxController extends Controller
     public function feedsAction(Request $request): Response
     {
         $offset = $request->query->get('offset') ? : $this->getParameter('rss_feeder.offset');
+        $request->query->remove('offset');
 
         try {
             $data = $this->feedHandler->getFeedsByConditions($request->query->all(), $offset);

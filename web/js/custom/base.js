@@ -61,7 +61,9 @@ function parameterHandler() {
 
     function addParameter(key, value) {
         if ($.type(key) === "string") {
-            $.extend(parameters, {key : value});
+            var obj = {};
+            obj[key] = value;
+            $.extend(parameters, obj);
 
             return true;
         }
@@ -71,7 +73,7 @@ function parameterHandler() {
 
     function addParameters(params) {
         if ($.isPlainObject(params)) {
-            $.extend(parameters, {key : value});
+            $.extend(parameters, params);
 
             return true;
         }
@@ -99,8 +101,8 @@ $(document).ready(function() {
     function applicationInit() {
         $('#alert').html('').hide();
 
-        $(document).on('categoryClick', function(e, eventInfo) {
-            subscribers = $('.category_link');
+        $(document).on('categoryClickDocument', function(e, eventInfo) {
+            subscribers = $('.subscribers-categoryClick');
             subscribers.trigger('categoryClick', eventInfo);
         });
     }

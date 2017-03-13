@@ -1,3 +1,8 @@
+<style type="text/css">
+    a:hover {
+        cursor:pointer;
+    }
+</style>
 <script>
     $(document).ready(function() {
         var categories = function () {},
@@ -10,6 +15,7 @@
             if (!$.isFunction(done)) {
                 done = function (resolvedData) {
                     var source = $('#categories').html();
+
                     if (!template) {
                         template = Handlebars.compile(source);
                     }
@@ -20,6 +26,11 @@
                             categories: resolvedData.data
                         }));
                     }
+
+                    $('.category_link').on('click', function(e) {
+                        var slug = $(this).data('slug');
+                        $(document).trigger('categoryClickDocument', {category_slug: slug});
+                    });
                 };
             }
             if (!$.isFunction(error)) {
@@ -42,16 +53,11 @@
 
         ajaxChannel = categories.init();
 
-        $('.category_link').on('click', function(e) {
-            var slug = $(this).data('slug');
-            $(document).trigger('categoryClick', {category_slug: slug});
-        });
-
         ajaxChannel.process();
     });
 </script>
 
-<div class='well'>
+<div id="test" class='well'>
     <h4>Blog Categories</h4>
     <div class='row'>
         <div class='col-lg-12'>

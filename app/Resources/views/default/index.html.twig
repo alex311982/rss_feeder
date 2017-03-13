@@ -40,7 +40,7 @@
                     if ($.isPlainObject(resolvedData)
                         && 'data' in resolvedData
                     ) {
-                        $('#main_news').append(template({
+                        $('#main_news').html(template({
                             news: resolvedData.data
                         }));
                     }
@@ -54,7 +54,8 @@
 
                     offsetHandler.setOffset(resolvedData.count);
                     ajaxHandler.getParameterHandler().addParameter('offset', offsetHandler.getOffset());
-
+console.log(offsetHandler.getOffset());
+console.log(resolvedData.total);
                     if (offsetHandler.getOffset() >= resolvedData.total) {
                         $('#more').hide();
                     }
@@ -81,14 +82,10 @@
         ajaxChannel = feeds.init();
 
         $('#main_news').on('categoryClick', function(e, eventInfo) {
-            ajaxChannel.process({slug : eventInfo.category_slug});
+            ajaxChannel.process({slug : eventInfo.category_slug, offset: 0});
         });
 
-        $('#more').click(
-            function () {
-                ajaxChannel.process();
-            }
-        );
+        $('#more').click(ajaxChannel.process());
 
         ajaxChannel.process();
     });
