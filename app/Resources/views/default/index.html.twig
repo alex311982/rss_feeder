@@ -94,7 +94,9 @@ console.log(resolvedData.total);
             ajaxChannel.process({slug : eventInfo.category_slug, 'offset' : offsetHandler.getOffset()});
         });
 
-        $('#more').click(ajaxChannel.process());
+        $('#more').click(function () {
+            ajaxChannel.process();
+        });
 
         ajaxChannel.process();
     });
