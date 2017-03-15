@@ -13,13 +13,21 @@
             function getOffset () {
                 return offset;
             }
-            function setOffset (count) {
+            function addOffset (count) {
                 offset += count;
+            }
+            function clearOffset () {
+                offset = 0;
+            }
+            function setOffset (count) {
+                offset = count;
             }
 
             return {
                 getOffset : getOffset,
-                setOffset : setOffset
+                setOffset : setOffset,
+                clearOffset: clearOffset,
+                addOffset: addOffset
             }
         }
 
@@ -52,7 +60,7 @@
                         $('#alert').html('').hide();
                     }
 
-                    offsetHandler.setOffset(resolvedData.count);
+                    offsetHandler.addOffset(resolvedData.count);
                     ajaxHandler.getParameterHandler().addParameter('offset', offsetHandler.getOffset());
 console.log(offsetHandler.getOffset());
 console.log(resolvedData.total);
@@ -82,7 +90,8 @@ console.log(resolvedData.total);
         ajaxChannel = feeds.init();
 
         $('#main_news').on('categoryClick', function(e, eventInfo) {
-            ajaxChannel.process({slug : eventInfo.category_slug, offset: 0});
+            offsetHandler.clearOffset();
+            ajaxChannel.process({slug : eventInfo.category_slug, 'offset' : offsetHandler.getOffset()});
         });
 
         $('#more').click(ajaxChannel.process());
