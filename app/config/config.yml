@@ -72,6 +72,6 @@ stof_doctrine_extensions:
             sluggable: true
 
 app:
-    per_frontend_request: 10
+    per_frontend_request: 3
     per_curl_request: 50
     feeds_reader_offset: 0
