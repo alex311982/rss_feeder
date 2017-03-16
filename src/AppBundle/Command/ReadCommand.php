@@ -10,7 +10,6 @@
 
 namespace AppBundle\Command;
 
-use FeedIo\Factory;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +20,7 @@ class ReadCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
-        $this->setName('read')
+        $this->setName('read:feeds')
             ->setDescription('reads a feed')
             ->addArgument(
                 'url',
@@ -42,21 +41,10 @@ class ReadCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string $url
-     * @return \FeedIo\FeedInterface
-     */
-    public function readFeed($url)
-    {
-        $feedIo = Factory::create()->getFeedIo();
-
-        return $feedIo->read($url)->getFeed();
-    }
-
-    /**
      * @param InputInterface $input
      * @return int|null
      */
-    public function getLimit(InputInterface $input)
+    protected function getLimit(InputInterface $input)
     {
         if ( $input->hasOption('count') ) {
             return intval($input->getOption('count'));
@@ -65,4 +53,3 @@ class ReadCommand extends ContainerAwareCommand
         return null;
     }
 }
-

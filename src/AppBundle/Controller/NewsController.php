@@ -5,12 +5,12 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
-class CategoryController extends Controller
+class NewsController extends Controller
 {
     public function indexAction(): Response
     {
-        return $this->render('default/categories.html.twig', [
-            'ajax_url' => $this->generateUrl('AJAX_categories'),
+        return $this->render('default/news.html.twig', [
+            'ajax_url' => $this->generateUrl('AJAX_feeds'),
             'format' => 'json',
         ]);
     }

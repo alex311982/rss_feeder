@@ -7,131 +7,13 @@
 
 <script>
     $(document).ready(function() {
-        function more() {
-            var offset = 0;
 
-            function getOffset () {
-                return offset;
-            }
-            function addOffset (count) {
-                offset += count;
-            }
-            function clearOffset () {
-                offset = 0;
-            }
-            function setOffset (count) {
-                offset = count;
-            }
-
-            return {
-                getOffset : getOffset,
-                setOffset : setOffset,
-                clearOffset: clearOffset,
-                addOffset: addOffset
-            }
-        }
-
-        var feeds = function () {},
-            offsetHandler = more(),
-            ajaxChannel;
-
-        feeds.init = function (done, error) {
-            var template,
-                ajaxHandler = ajaxManager();
-
-            if (!$.isFunction(done)) {
-                done = function (resolvedData) {
-                    var source = $('#news').html();
-                    if (!template) {
-                        template = Handlebars.compile(source);
-                    }
-                    if ($.isPlainObject(resolvedData)
-                        && 'data' in resolvedData
-                    ) {
-                        $('#main_news').append(template({
-                            news: resolvedData.data
-                        }));
-                    }
-                    if ($.isPlainObject(resolvedData)
-                        && 'error' in resolvedData
-                    ) {
-                        $('#alert').html(resolvedData.error).show();
-                    } else {
-                        $('#alert').html('').hide();
-                    }
-
-                    offsetHandler.addOffset(resolvedData.count);
-                    ajaxHandler.getParameterHandler().addParameter('offset', offsetHandler.getOffset());
-console.log(offsetHandler.getOffset());
-console.log(resolvedData.total);
-                    if (offsetHandler.getOffset() >= resolvedData.total) {
-                        $('#more').hide();
-                    } else {
-                        $('#more').show();
-                    }
-                };
-            }
-            if (!$.isFunction(error)) {
-                error = function (jqXHR, textStatus) {
-                    $('#alert').html('Error from server with status ' + textStatus).show();
-                };
-            }
-            ajaxHandler.init('{{ ajax_url }}', '{{ format }}', done, error);
-
-            return {
-                process: function(processData) {
-                    ajaxHandler.getParameterHandler().addParameters(processData);
-
-                    if (!ajaxHandler.send()) {
-                        $('#alert').html('Somethig wrong').show();
-                    }
-                }
-            }
-        };
-
-        ajaxChannel = feeds.init();
-
-        $('#main_news').on('categoryClick', function(e, eventInfo) {
-            offsetHandler.clearOffset();
-            $('#main_news').html('');
-            ajaxChannel.process({slug : eventInfo.category_slug, 'offset' : offsetHandler.getOffset()});
-        });
-
-        $('#more').click(function () {
-            ajaxChannel.process();
-        });
-
-        ajaxChannel.process();
     });
 </script>
 {% endblock %}
 
 {% block content %}
-    {% verbatim %}
-
-    <div id='main_news' class="subscribers-categoryClick"></div>
-    <script id='news' type='text/x-handlebars-template'>
-        {{#news}}
-        <h2>
-            <a href='{{link}}'>{{title}}</a>
-        </h2>
-        <p><span class='glyphicon glyphicon-time'></span>{{pubDate}}</p>
-
-        <img class='img-responsive' src='{{media.url}}' alt=''>
-
-        <p>{{description}}</p>
-        <a class='btn btn-primary' href='#'>Read More <span class='glyphicon glyphicon-chevron-right'></span></a>
-
-        {{/news}}
-    </script>
-
-    <!-- Pager -->
-    <button id='more' class='more btn btn-primary btn-block'>
-        More <span class='caret'></span>
-    </button>
-
-    {% endverbatim %}
-
+    {{ render(controller('AppBundle:News:index')) }}
 {% endblock %}
 
 {% block sidebar %}

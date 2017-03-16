@@ -1,0 +1,122 @@
+<style type="text/css">
+
+</style>
+<script>
+    $(document).ready(function() {
+        function news() {
+            var templateManager,
+                ajaxHandler,
+                offsetHandler;
+
+            function more() {
+                var offset = 0;
+
+                function getOffset () {
+                    return offset;
+                }
+                function addOffset (count) {
+                    offset += count;
+                }
+                function clearOffset () {
+                    offset = 0;
+                }
+                function setOffset (count) {
+                    offset = count;
+                }
+
+                return {
+                    getOffset : getOffset,
+                    setOffset : setOffset,
+                    clearOffset: clearOffset,
+                    addOffset: addOffset
+                }
+            }
+
+            function ajaxSuccess(resolvedData) {
+                var newsTemplate = templateManager.getTemplate('news');
+
+                if ($.isPlainObject(resolvedData)
+                    && 'data' in resolvedData
+                    && newsTemplate
+                ) {
+                    $('#main_news').append(newsTemplate({
+                        news: resolvedData.data
+                    }));
+                }
+                if ($.isPlainObject(resolvedData)
+                    && 'error' in resolvedData
+                ) {
+                    $('#alert').html(resolvedData.error).show();
+                } else {
+                    $('#alert').html('').hide();
+                }
+
+                offsetHandler.addOffset(resolvedData.count);
+                ajaxHandler.addParameter('offset', offsetHandler.getOffset());
+
+                if (offsetHandler.getOffset() >= resolvedData.total) {
+                    $('#more').hide();
+                } else {
+                    $('#more').show();
+                }
+            }
+
+            function ajaxError(jqXHR, textStatus) {
+                $('#alert').html('Error from server with status ' + textStatus).show();
+            }
+
+            function run(processData) {
+                ajaxHandler.addParameters(processData);
+
+                if (!ajaxHandler.send()) {
+                    $('#alert').html('Somethig wrong').show();
+                }
+            }
+
+            function init() {
+                offsetHandler = more();
+                offsetHandler.clearOffset();
+                templateManager = templateHandler();
+                templateManager.process('news');
+                ajaxHandler = ajaxManager();
+                ajaxHandler.init('{{ ajax_url }}', '{{ format }}', ajaxSuccess, ajaxError);
+
+                $('#main_news').on('categoryClick', function(e, eventInfo) {
+                    offsetHandler.clearOffset();
+                    $('#main_news').html('');
+                    run({slug : eventInfo.category_slug, 'offset' : offsetHandler.getOffset()});
+                });
+
+                $('#more').click(function () {
+                    run();
+                });
+            }
+
+            return {
+                init: init,
+                run: run
+            }
+        }
+    });
+</script>
+
+<div id='main_news' class="subscribers-categoryClick"></div>
+
+<!-- Pager -->
+<button id='more' class='more btn btn-primary btn-block'>
+    More <span class='caret'></span>
+</button>
+
+<script id='news' type='text/x-handlebars-template'>
+    {% verbatim %}
+        {{#news}}
+            <h2>
+                <a href='{{link}}'>{{title}}</a>
+            </h2>
+            <p><span class='glyphicon glyphicon-time'></span>{{pubDate}}</p>
+            <img class='img-responsive' src='{{media.url}}' alt=''>
+            <p>{{description}}</p>
+            <a class='btn btn-primary' href='#'>Read More <span class='glyphicon glyphicon-chevron-right'></span></a>
+        {{/news}}
+    {% endverbatim %}
+</script>

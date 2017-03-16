@@ -1,7 +1,7 @@
 function ajaxManager() {
     var urlAjax, dataTypeAjax, doneCB, errorCB, parameters;
 
-    function init(url, dataType, done, error) {
+    function init(el, url, dataType, done, error) {
         if (!$.isFunction(done)) {
             doneCB = function (data) {};
         } else {
@@ -45,13 +45,13 @@ function ajaxManager() {
         return false;
     }
 
-    function getParameterHandler() {
-        return parameters;
+    function addParameters(params) {
+        parameters.addParameters(params)
     }
 
     return {
         init: init,
-        getParameterHandler: getParameterHandler,
+        addParameters: addParameters,
         send: send
     }
 }
@@ -97,6 +97,44 @@ function parameterHandler() {
     }
 }
 
+function templateHandler() {
+    var templates = {};
+
+    function process(ids) {
+        ids = normalize(normalize);
+
+        $.map(ids, function(id) {
+            var source = $(id).html();
+            templates[id] = Handlebars.compile(source);
+        });
+    }
+
+    function getTemplate(id) {
+        if ($.type(id) === "string" && id in templates) {
+            return templates[id];
+        }
+
+        return null;
+    }
+
+    function normalize(ids) {
+        if (!$.isArray(ids) && $.type(ids) === "string") {
+            ids = [ids];
+        }
+
+        if (!$.isArray(ids)) {
+            ids = [];
+        }
+
+        return ids;
+    }
+
+    return {
+        process : process,
+        getTemplate: getTemplate
+    }
+}
+
 $(document).ready(function() {
     function applicationInit() {
         $('#alert').html('').hide();
@@ -105,6 +143,10 @@ $(document).ready(function() {
             subscribers = $('.subscribers-categoryClick');
             subscribers.trigger('categoryClick', eventInfo);
         });
+
+        var widgets = {
+            'feed': new Feed
+        };
     }
 
     applicationInit();
