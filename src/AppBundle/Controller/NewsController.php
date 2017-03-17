@@ -9,7 +9,7 @@ class NewsController extends Controller
 {
     public function indexAction(): Response
     {
-        return $this->render('default/news.html.twig', [
+        return $this->render('default/components/news.html.twig', [
             'ajax_url' => $this->generateUrl('AJAX_feeds'),
             'format' => 'json',
         ]);

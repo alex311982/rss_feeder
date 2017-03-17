@@ -1,9 +1,14 @@
 function ajaxManager() {
     var urlAjax, dataTypeAjax, doneCB, errorCB, parameters;
 
-    function init(el, url, dataType, done, error) {
+    function init(url, dataType, done, error) {
         if (!$.isFunction(done)) {
-            doneCB = function (data) {};
+            doneCB = function (jqXHR, textStatus) {
+                throw {
+                    message: "Error from server with status " + textStatus,
+                    name: "Ajax call"
+                }
+            };
         } else {
             doneCB = done;
         }
@@ -101,10 +106,10 @@ function templateHandler() {
     var templates = {};
 
     function process(ids) {
-        ids = normalize(normalize);
+        ids = normalize(ids);
 
         $.map(ids, function(id) {
-            var source = $(id).html();
+            var source = $('#' + id).html();
             templates[id] = Handlebars.compile(source);
         });
     }
@@ -135,19 +140,35 @@ function templateHandler() {
     }
 }
 
+function errorHandler(error) {
+    $(document).trigger('error', {error: error});
+}
+
 $(document).ready(function() {
-    function applicationInit() {
+    $('#alert').html('').hide();
+
+    $(document).on('widgetLoaded', function (e, eventInfo) {
+        var widget = eventInfo.widgetInstance;
+        widget.init();
+    });
+
+    $(document).on('widgetInited', function (e, eventInfo) {
+        var widget = eventInfo.widgetInstance;
+        widget.run();
+    });
+
+    $(document).on('moreClickDocument', function (e, eventInfo) {
         $('#alert').html('').hide();
+    });
 
-        $(document).on('categoryClickDocument', function(e, eventInfo) {
-            subscribers = $('.subscribers-categoryClick');
-            subscribers.trigger('categoryClick', eventInfo);
-        });
+    $(document).on('error', function (e, eventInfo) {
+        var error = eventInfo.error;
+        $('#alert').html('Ошибка ' + error.name + ":" + error.message).show();
+    });
 
-        var widgets = {
-            'feed': new Feed
-        };
-    }
-
-    applicationInit();
+    $(document).on('categoryClickDocument', function (e, eventInfo) {
+        $('#alert').html('').hide();
+        subscribers = $('.subscribers-categoryClick');
+        subscribers.trigger('categoryClick', eventInfo);
+    });
 });

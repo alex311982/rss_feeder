@@ -9,7 +9,7 @@ class CategoryController extends Controller
 {
     public function indexAction(): Response
     {
-        return $this->render('default/categories.html.twig', [
+        return $this->render('default/components/categories.html.twig', [
             'ajax_url' => $this->generateUrl('AJAX_categories'),
             'format' => 'json',
         ]);

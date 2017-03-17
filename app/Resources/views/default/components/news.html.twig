@@ -6,7 +6,8 @@
         function news() {
             var templateManager,
                 ajaxHandler,
-                offsetHandler;
+                offsetHandler,
+                moreButton = $('#more');
 
             function more() {
                 var offset = 0;
@@ -46,34 +47,49 @@
                 if ($.isPlainObject(resolvedData)
                     && 'error' in resolvedData
                 ) {
-                    $('#alert').html(resolvedData.error).show();
-                } else {
-                    $('#alert').html('').hide();
+                    var error = {
+                        message: resolvedData.error,
+                        name: "Server error",
+                        code: 500
+                    };
+                    errorHandler(error);
                 }
 
                 offsetHandler.addOffset(resolvedData.count);
-                ajaxHandler.addParameter('offset', offsetHandler.getOffset());
+                ajaxHandler.addParameters('offset', offsetHandler.getOffset());
 
                 if (offsetHandler.getOffset() >= resolvedData.total) {
-                    $('#more').hide();
+                    moreButton.hide();
                 } else {
-                    $('#more').show();
+                    moreButton.show();
                 }
             }
 
             function ajaxError(jqXHR, textStatus) {
-                $('#alert').html('Error from server with status ' + textStatus).show();
+                var error = {
+                    message: "Error from server with status " + textStatus,
+                    name: "Ajax call"
+                };
+                errorHandler(error);
             }
 
             function run(processData) {
                 ajaxHandler.addParameters(processData);
+                getNews();
+            }
 
+            function getNews() {
                 if (!ajaxHandler.send()) {
-                    $('#alert').html('Somethig wrong').show();
+                    var error = {
+                        message: "Ajax is not inited",
+                        name: "Ajax call"
+                    };
+                    errorHandler(error);
                 }
             }
 
             function init() {
+                moreButton.hide();
                 offsetHandler = more();
                 offsetHandler.clearOffset();
                 templateManager = templateHandler();
@@ -87,9 +103,16 @@
                     run({slug : eventInfo.category_slug, 'offset' : offsetHandler.getOffset()});
                 });
 
-                $('#more').click(function () {
-                    run();
+                moreButton.click(function () {
+                    $(document).trigger('moreClickDocument', {});
+                    getNews();
                 });
+
+                $(document).trigger('widgetInited', {widgetInstance: this});
+            }
+
+            function getName() {
+                return 'news';
             }
 
             return {
@@ -97,6 +120,8 @@
                 run: run
             }
         }
+
+        $(document).trigger('widgetLoaded', {widgetInstance: news()});
     });
 </script>
 
