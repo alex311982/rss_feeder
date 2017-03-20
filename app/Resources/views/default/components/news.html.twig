@@ -1,6 +1,7 @@
 <style type="text/css">
 
 </style>
+
 <script>
     $(document).ready(function() {
         function news() {
@@ -73,11 +74,6 @@
                 errorHandler(error);
             }
 
-            function run(processData) {
-                ajaxHandler.addParameters(processData);
-                getNews();
-            }
-
             function getNews() {
                 if (!ajaxHandler.send()) {
                     var error = {
@@ -108,7 +104,12 @@
                     getNews();
                 });
 
-                $(document).trigger('widgetInited', {widgetInstance: this});
+                $(document).trigger('widgetInited', {widgetName: getName()});
+            }
+
+            function run(processData) {
+                ajaxHandler.addParameters(processData);
+                getNews();
             }
 
             function getName() {
@@ -117,7 +118,8 @@
 
             return {
                 init: init,
-                run: run
+                run: run,
+                getName: getName
             }
         }
 

@@ -13,5 +13,6 @@
 {% endblock %}
 
 {% block content %}
+    {{ render(controller('AppBundle:Alert:index')) }}
     {{ render(controller('AppBundle:News:index')) }}
 {% endblock %}

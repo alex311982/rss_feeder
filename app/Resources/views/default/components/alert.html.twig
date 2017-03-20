@@ -1,0 +1,74 @@
+<style type="text/css">
+
+</style>
+
+<script>
+    $(document).ready(function() {
+        function alert() {
+
+            var messageToDisplay,
+                isDisplay,
+                alert = $('#alert');
+
+            function run(runData) {
+                var alertTemplate = templateManager.getTemplate('alert_tpl');
+                console.log(runData);
+                console.log($.isPlainObject(runData) && 'message' in runData);
+                if ($.isPlainObject(runData) && 'message' in runData) {
+                    console.log('ddddddddddddddddddd');
+                    messageToDisplay = setMessage(runData.message);
+                }
+console.log('1111111111111111111111111111111111111111');
+console.log(messageToDisplay);
+console.log(getMessage());
+console.log(alertTemplate({
+    message: getMessage()
+}));
+                alert.html(alertTemplate({
+                    message: getMessage()
+                }));
+
+                alert.toggle(isDisplay);
+            }
+
+            function init() {
+                templateManager = templateHandler();
+                templateManager.process('alert_tpl');
+                setMessage('{{init_message}}');
+
+                $(document).trigger('widgetInited', {widgetName: getName()});
+            }
+            
+            function setMessage(message) {
+                console.log('setMessage');
+                console.log(message);
+                messageToDisplay = message;
+                isDisplay = !!messageToDisplay;
+            }
+
+            function getMessage() {
+                return messageToDisplay ? messageToDisplay : '';
+            }
+
+            function getName() {
+                return 'alert';
+            }
+
+            return {
+                init: init,
+                run: run,
+                getName: getName
+            }
+        }
+
+        $(document).trigger('widgetLoaded', {widgetInstance: alert()});
+    });
+</script>
+
+<div id="alert" class="alert alert-danger"></div>
+
+<script id='alert_tpl' type='text/x-handlebars-template'>
+    {% verbatim %}
+        {{message}}
+    {% endverbatim %}
+</script>
