@@ -1,0 +1,104 @@
+<style type="text/css">
+    a:hover {
+        cursor:pointer;
+    }
+</style>
+<script>
+    $(document).ready(function() {
+
+        function categories() {
+            var templateManager,
+                ajaxHandler,
+                categoryLink = $('.category_link');
+
+            function ajaxSuccess(resolvedData) {
+                var categoriesTemplate = templateManager.getTemplate('categories');
+
+                if ($.isPlainObject(resolvedData)
+                    && 'data' in resolvedData
+                    && categoriesTemplate
+                ) {
+                    $('#categories_list').append(categoriesTemplate({
+                        categories: resolvedData.data
+                    }));
+                }
+                if ($.isPlainObject(resolvedData)
+                    && 'error' in resolvedData
+                ) {
+                    var error = {
+                        message: resolvedData.error,
+                        name: "Server error",
+                        code: 500
+                    };
+                    errorHandler(error);
+                }
+            }
+
+            function ajaxError(jqXHR, textStatus) {
+                var error = {
+                    message: "Error from server with status " + textStatus,
+                    name: "Ajax call"
+                };
+                errorHandler(error);
+            }
+
+            function getCategories() {
+                if (!ajaxHandler.send()) {
+                    var error = {
+                        message: "Ajax is not inited",
+                        name: "Ajax call"
+                    };
+                    errorHandler(error);
+                }
+            }
+
+            function init() {
+                templateManager = templateHandler();
+                templateManager.process('categories');
+                ajaxHandler = ajaxManager();
+                ajaxHandler.init('{{ ajax_url }}', '{{ format }}', ajaxSuccess, ajaxError);
+
+                $('#categories_list').on('click', '.category_link', function(e) {
+                    var slug = $(this).data('slug');
+                    $(document).trigger('categoryClickDocument', {category_slug: slug});
+                });
+
+                $(document).trigger('widgetInited', {widgetName: getName()});
+            }
+
+            function run(processData) {
+                ajaxHandler.addParameters(processData);
+                getCategories();
+            }
+
+            function getName() {
+                return 'categories';
+            }
+
+            return {
+                init: init,
+                run: run,
+                getName: getName
+            }
+        }
+
+        $(document).trigger('widgetLoaded', {widgetInstance: categories()});
+    });
+</script>
+
+<div id="categories_list" class='well'>
+    <h4>Blog Categories</h4>
+    <div class='row'>
+        <div class='col-lg-12'>
+            <ul id='categories_list' class='list-unstyled'></ul>
+        </div>
+    </div>
+</div>
+
+<script id='categories' type='text/x-handlebars-template'>
+    {% verbatim %}
+        {{#categories}}
+            <li><a class='category_link' data-slug='{{ slug }}'>{{ name }}</a></li>
+        {{/categories}}
+    {% endverbatim %}
+</script>

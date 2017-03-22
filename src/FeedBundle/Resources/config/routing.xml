@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <route id="index" path="/">
+        <default key="_controller">FeedBundle:Feed:index</default>
+    </route>
+
+    <route id="category" path="/category/{slug}">
+        <default key="_controller">FeedBundle:Category:category</default>
+    </route>
+
+    <route id="AJAX_feeds" path="/ajax/feeds">
+        <default key="_controller">FeedBundle:Ajax:feeds</default>
+    </route>
+
+    <route id="AJAX_categories" path="/ajax/categories">
+        <default key="_controller">FeedBundle:Ajax:categories</default>
+    </route>
+
+</routes>

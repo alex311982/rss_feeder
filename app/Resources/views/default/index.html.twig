@@ -16,3 +16,7 @@
     {{ render(controller('AppBundle:Alert:index')) }}
     {{ render(controller('AppBundle:News:index')) }}
 {% endblock %}
+
+{% block sidebar %}
+    {{ render(controller('AppBundle:Category:index')) }}
+{% endblock %}

@@ -55,6 +55,10 @@ function ajaxManager() {
         parameters.addParameters(params)
     }
 
+    function addParameter(key, param) {
+        parameters.addParameter(key, param)
+    }
+
     function parameterHandler() {
         var parameters = {};
 
@@ -99,6 +103,7 @@ function ajaxManager() {
     return {
         init: init,
         addParameters: addParameters,
+        addParameter: addParameter,
         send: send
     }
 }

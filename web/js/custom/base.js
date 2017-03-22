@@ -10,25 +10,22 @@ $(document).ready(function() {
     });
 
     $(document).on('widgetInited', function (e, eventInfo) {
-        var widgetName = eventInfo.widgetName;
-        widgets[widgetName].run();
+        var name = eventInfo.widgetName;
+        widgets[name].run();
     });
 
-    // $(document).on('moreClickDocument', function (e, eventInfo) {
-    //     console.log('moreClickDocument');
-    //     widgets['alert'].run({message : ''});
-    // });
+    $(document).on('moreClickDocument', function (e, eventInfo) {
+
+    });
 
     $(document).on('error', function (e, eventInfo) {
         var error = eventInfo.error,
-            alertMessage = {message : 'Ошибка ' + error.name + ':' + error.message};
-
+            alertMessage = {message : 'Ошибка ' + error.name + ':' + error.message}
         widgets['alert'].run(alertMessage);
     });
 
-    // $(document).on('categoryClickDocument', function (e, eventInfo) {
-    //     widgets['alert'].run({message : ''});
-    //     subscribers = $('.subscribers-categoryClick');
-    //     subscribers.trigger('categoryClick', eventInfo);
-    // });
+    $(document).on('categoryClickDocument', function(e, eventInfo) {
+        widgets['news'].clearContent();
+        widgets['news'].run({slug : eventInfo.category_slug});
+    });
 });

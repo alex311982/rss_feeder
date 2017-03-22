@@ -71,7 +71,9 @@ stof_doctrine_extensions:
             timestampable: true
             sluggable: true
 
-app:
+news_component:
     per_frontend_request: 3
+    news_offset: 0
+
+feed:
     per_curl_request: 50
-    feeds_reader_offset: 0
