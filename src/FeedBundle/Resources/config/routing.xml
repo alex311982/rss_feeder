@@ -11,13 +11,4 @@
     <route id="category" path="/category/{slug}">
         <default key="_controller">FeedBundle:Category:category</default>
     </route>
-
-    <route id="AJAX_feeds" path="/ajax/feeds">
-        <default key="_controller">FeedBundle:Ajax:feeds</default>
-    </route>
-
-    <route id="AJAX_categories" path="/ajax/categories">
-        <default key="_controller">FeedBundle:Ajax:categories</default>
-    </route>
-
 </routes>

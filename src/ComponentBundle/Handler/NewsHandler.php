@@ -17,20 +17,14 @@ class NewsHandler implements NewsHandlerInterface
      * @var int
      */
     protected $frontLimit;
-    /**
-     * @var array
-     */
-    protected $news;
 
     public function __construct(
         EntityManager $em,
-        int $frontLimit,
-        int $curlLimit
+        int $frontLimit
     )
     {
         $this->em = $em;
         $this->frontLimit = $frontLimit;
-        $this->news = [];
     }
 
     /**
@@ -41,9 +35,7 @@ class NewsHandler implements NewsHandlerInterface
      */
     public function getNewsByConditions(array $condtitions = [], int $offset): array
     {
-        if ($this->news) {
-            return $this->news;
-        }
+        $newsItems = [];
 
         /** @var NewsEntityRepository $newsRepository */
         $newsRepository = $this->getRepository('ComponentBundle:NewsEntity');
@@ -55,10 +47,10 @@ class NewsHandler implements NewsHandlerInterface
 
         /** @var NewsEntity $newsItem */
         foreach($news as $newsItem) {
-            array_push($this->news, $newsItem->toArray());
+            array_push($newsItems, $newsItem->toArray());
         }
 
-        return $this->news;
+        return $newsItems;
     }
 
     public function getNewsCount(array $criteria = []): int

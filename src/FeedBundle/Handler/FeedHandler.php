@@ -2,10 +2,9 @@
 
 namespace FeedBundle\Handler;
 
-use FeedBundle\Entity\FeedEntity;
-use FeedBundle\Entity\MediaEntity;
+use ComponentBundle\Entity\MediaEntity;
+use ComponentBundle\Entity\NewsEntity;
 use FeedBundle\Exception\FeederException;
-use FeedBundle\Repository\FeedEntityRepository;
 use Doctrine\ORM\EntityManager;
 use FeedIo\Adapter\NotFoundException;
 use FeedIo\Adapter\ServerErrorException;
@@ -26,28 +25,17 @@ class FeedHandler implements FeedHandlerInterface
     /**
      * @var int
      */
-    protected $frontLimit;
-    /**
-     * @var int
-     */
     protected $curlLimit;
-    /**
-     * @var array
-     */
-    protected $feeds;
 
     public function __construct(
         FeedIo $feedParser,
         EntityManager $em,
-        int $frontLimit,
         int $curlLimit
     )
     {
         $this->feedParser = $feedParser;
         $this->em = $em;
-        $this->frontLimit = $frontLimit;
         $this->curlLimit = $curlLimit;
-        $this->feeds = [];
     }
 
     /**
@@ -61,17 +49,17 @@ class FeedHandler implements FeedHandlerInterface
     {
         $feed = $this->process($url);
         $count > 0  ? : $count = $this->curlLimit;
-        $this->getRepository('FeedBundle:NewsEntity')->truncate();
-        $this->getRepository('FeedBundle:MediaEntity')->truncate();
+        $this->getRepository('ComponentBundle:NewsEntity')->truncate();
+        $this->getRepository('ComponentBundle:MediaEntity')->truncate();
 
         foreach($feed as $i => $item) {
-            $feedEntity = $this->feedToEntityTransformer($item);
+            $newsItem = $this->feedToEntityTransformer($item);
             if ($item->hasMedia()) {
                 $mediaEntity = $this->mediaToEntityTransformer($item);
                 $this->em->persist($mediaEntity);
-                $feedEntity->setMedia($mediaEntity);
+                $newsItem->setMedia($mediaEntity);
             }
-            $this->em->persist($feedEntity);
+            $this->em->persist($newsItem);
 
             if ($count === $i+1 ) {
                 break;
@@ -99,13 +87,13 @@ class FeedHandler implements FeedHandlerInterface
 
     /**
      * @param Item $feed
-     * @return FeedEntity
+     * @return NewsEntity
      */
-    protected function feedToEntityTransformer(Item $feed): FeedEntity
+    protected function feedToEntityTransformer(Item $feed): NewsEntity
     {
         $category = $feed->getCategories()->current()->getLabel() ? : null;
 
-        return new FeedEntity(
+        return new NewsEntity(
             $feed->getPublicId(),
             $category,
             $feed->getTitle(),

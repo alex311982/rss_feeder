@@ -16,13 +16,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('rss_feader');
 
         $rootNode->children()
-            ->integerNode('per_frontend_request')
-                ->defaultValue(10)
-            ->end()
             ->integerNode('per_curl_request')
-                ->defaultValue(10)
-            ->end()
-            ->integerNode('feeds_reader_offset')
                 ->defaultValue(10)
             ->end()
         ->end();

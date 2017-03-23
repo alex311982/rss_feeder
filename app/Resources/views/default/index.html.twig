@@ -13,10 +13,10 @@
 {% endblock %}
 
 {% block content %}
-    {{ render(controller('AppBundle:Alert:index')) }}
-    {{ render(controller('AppBundle:News:index')) }}
+    {{ render(controller('ComponentBundle:Components/Alert:index')) }}
+    {{ render(controller('ComponentBundle:Components/News:index')) }}
 {% endblock %}
 
 {% block sidebar %}
-    {{ render(controller('AppBundle:Category:index')) }}
+    {{ render(controller('ComponentBundle:Components/Category:index')) }}
 {% endblock %}

@@ -1,6 +1,6 @@
 <?php
 
-namespace ComponentBundle\Controller;
+namespace ComponentBundle\Controller\Components;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;

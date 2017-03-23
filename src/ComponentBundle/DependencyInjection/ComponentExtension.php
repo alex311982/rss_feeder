@@ -23,7 +23,7 @@ class ComponentExtension extends Extension
         );
         $loader->load('services.yml');
 
-        $container->setParameter('news.limit_frontend', $config['per_frontend_request']);
-        $container->setParameter('news.offset', $config['news_offset']);
+        $container->setParameter('component.news.limit_frontend', $config['news']['per_frontend_request']);
+        $container->setParameter('component.news.offset', $config['news']['news_offset']);
     }
 }

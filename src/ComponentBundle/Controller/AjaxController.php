@@ -33,7 +33,7 @@ class AjaxController extends Controller
      */
     public function newsAction(Request $request): Response
     {
-        $offset = $request->query->get('offset') ? : $this->getParameter('news.offset');
+        $offset = $request->query->get('offset') ? : $this->getParameter('component.news.offset');
         $request->query->remove('offset');
 
         try {

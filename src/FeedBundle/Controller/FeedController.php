@@ -9,9 +9,7 @@ class FeedController extends Controller
 {
     public function indexAction(Request $request)
     {
-        return $this->render('FeedBundle:Components:index.html.twig', [
-            'ajax_url' => $this->generateUrl('AJAX_feeds'),
-            'format' => 'json',
+        return $this->render('default/index.html.twig', [
             'page_header' => 'News'
         ]);
     }

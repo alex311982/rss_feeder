@@ -71,9 +71,16 @@ stof_doctrine_extensions:
             timestampable: true
             sluggable: true
 
-news_component:
-    per_frontend_request: 3
-    news_offset: 0
+component:
+    news:
+        per_frontend_request: 3
+        news_offset: 0
 
 feed:
     per_curl_request: 50
+
+assetic:
+    debug:          '%kernel.debug%'
+    use_controller: '%kernel.debug%'
+    filters:
+        cssrewrite: ~

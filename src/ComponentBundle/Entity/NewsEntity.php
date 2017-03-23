@@ -2,6 +2,7 @@
 
 namespace ComponentBundle\Entity;
 
+use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -322,20 +323,24 @@ class NewsEntity
      */
     public function toArray():array
     {
-        $properties = get_object_vars($this);
+//        $properties = get_object_vars($this);
+//
+//        foreach( $properties as $name => $property ) {
+//            if ( $property instanceof \DateTime ) {
+//                $properties[$name] = $property->format(\DateTime::ATOM);
+//            }
+//        }
+//        var_dump($properties);exit;
+//        $properties['media'] = [];
+//
+//        if ($media = $this->getMedia()) {
+//            $properties['media'] = $media->toArray();
+//        }
+//
+//        return $properties;
 
-        foreach( $properties as $name => $property ) {
-            if ( $property instanceof \DateTime ) {
-                $properties[$name] = $property->format(\DateTime::ATOM);
-            }
-        }
+        $serializer = SerializerBuilder::create()->build();
 
-        $properties['media'] = [];
-
-        if ($media = $this->getMedia()) {
-            $properties['media'] = $media->toArray();
-        }
-
-        return $properties;
+        return $serializer->toArray($this);
     }
 }

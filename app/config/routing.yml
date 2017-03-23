@@ -1,10 +1,6 @@
-feed:
-    resource: "@FeedBundle/Resources/config/routing.yml"
+component:
+    resource: "@ComponentBundle/Resources/config/routing.xml"
     prefix:   /
 
-app:
-    resource: "@AppBundle/Controller/"
-    type:     annotation
-
 rssfeed:
-    resource: "@AppBundle/Resources/config/routing.xml"
+    resource: "@FeedBundle/Resources/config/routing.xml"

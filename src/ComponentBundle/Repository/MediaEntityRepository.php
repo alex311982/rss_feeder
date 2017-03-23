@@ -1,6 +1,6 @@
 <?php
 
-namespace FeedBundle\Repository;
+namespace ComponentBundle\Repository;
 
 /**
  * MediaEntityRepository

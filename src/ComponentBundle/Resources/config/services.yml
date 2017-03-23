@@ -2,7 +2,7 @@ services:
 
     news.handler:
         class: ComponentBundle\Handler\NewsHandler
-        arguments: ["@doctrine.orm.entity_manager", "%news.limit_frontend%"]
+        arguments: ["@doctrine.orm.entity_manager", "%component.news.limit_frontend%"]
 
     category.handler:
         class: ComponentBundle\Handler\CategoryHandler
