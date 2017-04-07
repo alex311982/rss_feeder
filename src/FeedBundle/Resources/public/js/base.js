@@ -26,6 +26,6 @@ $(document).ready(function() {
 
     $(document).on('categoryClickDocument', function(e, eventInfo) {
         widgets['news'].clearContent();
-        widgets['news'].run({slug : eventInfo.category_slug});
+        widgets['news'].run({category : eventInfo.category_id});
     });
 });

@@ -92,7 +92,7 @@ $(document).ready(function() {
             templateManager = templateHandler();
             templateManager.process('news');
             ajaxHandler = ajaxManager();
-            ajaxHandler.init('{{ ajax_url }}', '{{ format }}', ajaxSuccess, ajaxError);
+            ajaxHandler.init(ajaxUrlNews, formatNews, ajaxSuccess, ajaxError);
 
             isClearContent = false;
 

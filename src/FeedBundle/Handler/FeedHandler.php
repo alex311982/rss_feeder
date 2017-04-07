@@ -2,15 +2,17 @@
 
 namespace FeedBundle\Handler;
 
+use ComponentBundle\Entity\CategoryEntity;
 use ComponentBundle\Entity\MediaEntity;
 use ComponentBundle\Entity\NewsEntity;
+use Doctrine\Common\Collections\ArrayCollection;
 use FeedBundle\Exception\FeederException;
 use Doctrine\ORM\EntityManager;
-use FeedIo\Adapter\NotFoundException;
-use FeedIo\Adapter\ServerErrorException;
 use FeedIo\Feed\Item;
+use FeedIo\Feed\ItemInterface;
 use FeedIo\FeedInterface;
 use FeedIo\FeedIo;
+use FeedIo\FeedIoException;
 
 class FeedHandler implements FeedHandlerInterface
 {
@@ -27,6 +29,8 @@ class FeedHandler implements FeedHandlerInterface
      */
     protected $curlLimit;
 
+    protected $persistedCategories;
+
     public function __construct(
         FeedIo $feedParser,
         EntityManager $em,
@@ -36,6 +40,7 @@ class FeedHandler implements FeedHandlerInterface
         $this->feedParser = $feedParser;
         $this->em = $em;
         $this->curlLimit = $curlLimit;
+        $this->persistedCategories = new ArrayCollection();
     }
 
     /**
@@ -43,30 +48,34 @@ class FeedHandler implements FeedHandlerInterface
      *
      * @param string $url
      * @param int $count
-     * @throws FeederException
+     * @throws \Exception
      */
     public function getLastFeeds(string $url, int $count)
     {
         $feed = $this->process($url);
         $count > 0  ? : $count = $this->curlLimit;
-        $this->getRepository('ComponentBundle:NewsEntity')->truncate();
-        $this->getRepository('ComponentBundle:MediaEntity')->truncate();
+
+        $this->truncateTables();
 
         foreach($feed as $i => $item) {
-            $newsItem = $this->feedToEntityTransformer($item);
-            if ($item->hasMedia()) {
-                $mediaEntity = $this->mediaToEntityTransformer($item);
-                $this->em->persist($mediaEntity);
-                $newsItem->setMedia($mediaEntity);
-            }
-            $this->em->persist($newsItem);
+            $categoryName = !is_null($item->getCategories()->current())
+                ? $item->getCategories()->current()->getLabel() :
+                '';
 
-            if ($count === $i+1 ) {
+            $category = $this->addCategory($categoryName);
+            $media = $this->addMedia($item);
+            $news = $this->addNews($item, $category, $media);
+
+            if ($count === $i+1) {
                 break;
             }
         }
 
-        $this->em->flush();
+        try {
+            $this->em->flush();
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 
     /**
@@ -78,44 +87,69 @@ class FeedHandler implements FeedHandlerInterface
     {
         try {
             return $this->feedParser->read($url)->getFeed();
-        } catch (NotFoundException $e) {
-            throw new FeederException(FeederException::SERVER_NOT_FOUND_ERROR_MSG);
-        } catch (ServerErrorException $e) {
-            throw new FeederException(FeederException::SERVER_ERROR_MSG);
+        } catch (FeedIoException $e) {
+            throw new FeederException(FeederException::FEEDER_ERROR);
         }
     }
 
-    /**
-     * @param Item $feed
-     * @return NewsEntity
-     */
-    protected function feedToEntityTransformer(Item $feed): NewsEntity
+    protected function truncateTables()
     {
-        $category = $feed->getCategories()->current()->getLabel() ? : null;
+        $this->getRepository('ComponentBundle:NewsEntity')->truncate();
+        $this->getRepository('ComponentBundle:CategoryEntity')->truncate();
+        $this->getRepository('ComponentBundle:MediaEntity')->truncate();
+    }
 
-        return new NewsEntity(
-            $feed->getPublicId(),
+    protected function addCategory(string $name): CategoryEntity
+    {
+        $key = md5($name);
+
+        $category = $this->persistedCategories->offsetExists($key)
+            ? $this->persistedCategories->get($key)
+            : null;
+
+        $category = $category ?: new CategoryEntity($name);
+        $this->persistedCategories->set($key, $category);
+        $this->em->persist($category);
+
+        return $category;
+    }
+
+    protected function addNews(ItemInterface $item, CategoryEntity $category, ?MediaEntity $media): NewsEntity
+    {
+        $news = new NewsEntity(
+            $item->getPublicId(),
             $category,
-            $feed->getTitle(),
-            $feed->getDescription(),
-            $feed->getLastModified(),
-            $feed->getLink()
+            $item->getTitle(),
+            $item->getDescription(),
+            $item->getLastModified(),
+            $item->getLink(),
+            $media
         );
+
+        $this->em->persist($news);
+
+        return $news;
     }
 
     /**
      * @param Item $item
-     * @return MediaEntity
+     * @return MediaEntity | null
      */
-    protected function mediaToEntityTransformer(Item $item): MediaEntity
+    protected function addMedia(Item $item): ?MediaEntity
     {
-        $media = $item->getMedias()->current();
+        $media= null;
 
-        return new MediaEntity(
-            $media->getType(),
-            $media->getUrl(),
-            $media->getLength()
-        );
+        if ($mediaFromFeed = $item->getMedias()->current()) {
+            $media = new  MediaEntity(
+                $mediaFromFeed->getType(),
+                $mediaFromFeed->getUrl(),
+                $mediaFromFeed->getLength()
+            );
+
+            $this->em->persist($media);
+        }
+
+        return $media;
     }
 
     /**

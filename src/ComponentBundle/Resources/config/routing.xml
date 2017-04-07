@@ -4,12 +4,8 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="AJAX_news" path="/ajax/news">
-        <default key="_controller">ComponentBundle:Ajax:news</default>
-    </route>
-
-    <route id="AJAX_categories" path="/ajax/categories">
-        <default key="_controller">ComponentBundle:Ajax:categories</default>
+    <route id="AJAX_component" path="/ajax/{component}">
+        <default key="_controller">ComponentBundle:Ajax:index</default>
     </route>
 
 </routes>

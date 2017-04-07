@@ -78,9 +78,3 @@ component:
 
 feed:
     per_curl_request: 50
-
-assetic:
-    debug:          '%kernel.debug%'
-    use_controller: '%kernel.debug%'
-    filters:
-        cssrewrite: ~

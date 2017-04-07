@@ -10,6 +10,7 @@
 
 namespace FeedBundle\Command;
 
+use FeedBundle\Exception\FeederException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,22 +32,33 @@ class ReadCommand extends ContainerAwareCommand
         ;
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @return null
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $url = $input->getArgument('url');
         $limit = $this->getLimit($input);
         $feedHandler = $this->getContainer()->get('feed.handler');
 
-        $feedHandler->getLastFeeds($url, $limit);
+        try {
+            $feedHandler->getLastFeeds($url, $limit);
+        } catch (FeederException $e) {
+            $output->writeln("<error>{$e->getMessage()}</error>"); // Red Text
+        }
     }
 
     /**
      * @param InputInterface $input
+     *
      * @return int|null
      */
     protected function getLimit(InputInterface $input)
     {
-        if ( $input->hasOption('count') ) {
+        if ($input->hasOption('count')) {
             return intval($input->getOption('count'));
         }
 

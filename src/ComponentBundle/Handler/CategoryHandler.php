@@ -2,12 +2,13 @@
 
 namespace ComponentBundle\Handler;
 
-use ComponentBundle\Entity\NewsEntity;
+use ComponentBundle\Entity\CategoryEntity;
 use ComponentBundle\Exception\ComponentException;
-use ComponentBundle\Repository\NewsEntityRepository;
+use ComponentBundle\Handler\Interfaces\HandlerInterfaces;
+use ComponentBundle\Repository\CategoryEntityRepository;
 use Doctrine\ORM\EntityManager;
 
-class CategoryHandler implements CategoryHandlerInterface
+class CategoryHandler implements HandlerInterfaces
 {
     /**
      * @var EntityManager
@@ -18,36 +19,49 @@ class CategoryHandler implements CategoryHandlerInterface
      */
     protected $categories;
 
+    protected $options;
+
     public function __construct(EntityManager $em)
     {
         $this->em = $em;
         $this->categories = [];
+        $this->options = [];
     }
 
-    public function getCategories(): array
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
+    }
+
+    public function getData(): array
     {
         if ($this->categories) {
             return $this->categories;
         }
 
-        /** @var NewsEntityRepository $newsRepository */
-        $newsRepository = $this->getRepository('ComponentBundle:NewsEntity');
+        /** @var CategoryEntityRepository $categoryRepository */
+        $categoryRepository = $this->getRepository('ComponentBundle:CategoryEntity');
 
         try {
-            $news = $newsRepository->findAll();
+            $this->categories = $categoryRepository->findAll();
         } catch (\Exception $e) {
             throw new ComponentException(ComponentException::ORM_ERROR_MSG);
         }
 
-        /** @var NewsEntity $newsItem */
-        foreach ($news as $newsItem) {
-            $this->categories[$newsItem->getSlug()] = [
-                'name' => $newsItem->getCategory(),
-                'slug' => $newsItem->getSlug(),
-            ];
+        /** @var CategoryEntity $categoryItem */
+        foreach($this->categories as $key => $categoryItem) {
+            $this->categories[$key] = $categoryItem->toArray();
         }
 
         return $this->categories;
+    }
+
+    public function getTotal(): int
+    {
+        /** @var CategoryEntityRepository $categoryRepository */
+        $categoryRepository = $this->getRepository('ComponentBundle:CategoryEntity');
+
+        return $categoryRepository->findTotalByConditions($this->options);
     }
 
     /**

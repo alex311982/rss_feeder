@@ -22,22 +22,19 @@ class NewsEntity
     protected $id;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=false)
      * @Assert\NotBlank()
+     *
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     protected $guid;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=false)
      * @Assert\NotBlank()
+     *
+     * @ORM\ManyToOne(targetEntity="CategoryEntity", inversedBy="name")
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
      */
     protected $category;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Gedmo\Slug(fields={"category"}, updatable=false, unique=false)
-     */
-    protected $slug;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=false)
@@ -90,14 +87,22 @@ class NewsEntity
      * @param $pubDate
      * @param $link
      */
-    public function __construct($guid, $category, $title, $description, $pubDate, $link)
-    {
+    public function __construct(
+        string $guid,
+        CategoryEntity $category,
+        string $title,
+        string $description,
+        \DateTime $pubDate,
+        string $link,
+        ?MediaEntity $media
+    ) {
         $this->guid = $guid;
         $this->category = $category;
         $this->title = $title;
         $this->description = $description;
         $this->pubDate = $pubDate;
         $this->link = $link;
+        $this->media = $media;
     }
 
     /**
@@ -132,22 +137,6 @@ class NewsEntity
     public function getGuid()
     {
         return $this->guid;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSlug()
-    {
-        return $this->slug;
-    }
-
-    /**
-     * @param string $slug
-     */
-    public function setSlug($slug)
-    {
-        $this->slug = $slug;
     }
 
     /**
@@ -323,22 +312,6 @@ class NewsEntity
      */
     public function toArray():array
     {
-//        $properties = get_object_vars($this);
-//
-//        foreach( $properties as $name => $property ) {
-//            if ( $property instanceof \DateTime ) {
-//                $properties[$name] = $property->format(\DateTime::ATOM);
-//            }
-//        }
-//        var_dump($properties);exit;
-//        $properties['media'] = [];
-//
-//        if ($media = $this->getMedia()) {
-//            $properties['media'] = $media->toArray();
-//        }
-//
-//        return $properties;
-
         $serializer = SerializerBuilder::create()->build();
 
         return $serializer->toArray($this);

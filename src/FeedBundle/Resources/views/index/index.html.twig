@@ -1,0 +1,12 @@
+{% extends 'FeedBundle::base.html.twig' %}
+
+{% block title %}RSS feeds{% endblock %}
+
+{% block content %}
+    {{ render(controller('ComponentBundle:Component:index', { 'component': 'Alert' })) }}
+    {{ render(controller('ComponentBundle:Component:index', { 'component': 'News' })) }}
+{% endblock %}
+
+{% block sidebar %}
+    {{ render(controller('ComponentBundle:Component:index', { 'component': 'Category' })) }}
+{% endblock %}

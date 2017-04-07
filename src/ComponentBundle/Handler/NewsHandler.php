@@ -4,10 +4,12 @@ namespace ComponentBundle\Handler;
 
 use ComponentBundle\Entity\NewsEntity;
 use ComponentBundle\Exception\ComponentException;
+use ComponentBundle\Handler\Interfaces\HandlerInterfaces;
+use ComponentBundle\Repository\Interfaces\RepositoryInterface;
 use ComponentBundle\Repository\NewsEntityRepository;
 use Doctrine\ORM\EntityManager;
 
-class NewsHandler implements NewsHandlerInterface
+class NewsHandler implements HandlerInterfaces
 {
     /**
      * @var EntityManager
@@ -17,32 +19,52 @@ class NewsHandler implements NewsHandlerInterface
      * @var int
      */
     protected $frontLimit;
+    /**
+     * @var int
+     */
+    protected $offset;
+
+    protected $options;
 
     public function __construct(
         EntityManager $em,
-        int $frontLimit
-    )
-    {
+        int $frontLimit,
+        int $offset
+    ) {
         $this->em = $em;
         $this->frontLimit = $frontLimit;
+        $this->setOffset($offset);
+        $this->options = [];
+    }
+
+    public function setOptions(array $options)
+    {
+        $offset = isset($options['offset']) ? $options['offset'] : $this->offset;
+        unset($options['offset']);
+        $this->options = $options;
+        $this->setOffset($offset);
     }
 
     /**
-     * @param array $condtitions
      * @return array
      * @throws ComponentException
      * @internal param int $offset
      */
-    public function getNewsByConditions(array $condtitions = [], int $offset): array
+    public function getData(): array
     {
         $newsItems = [];
 
         /** @var NewsEntityRepository $newsRepository */
         $newsRepository = $this->getRepository('ComponentBundle:NewsEntity');
+
         try {
-            $news = $newsRepository->findWithLimitAndOffset($condtitions, $this->frontLimit, $offset);
+            $news = $newsRepository->findBy($this->options, ['pubDate' => 'DESC'], $this->frontLimit, $this->offset);
         } catch (\Exception $e) {
-            throw new ComponentException(ComponentException::ORM_ERROR_MSG);
+            throw new ComponentException(ComponentException::formatMsg(
+                ['%component_name%' => 'news'],
+                ComponentException::ORM_ERROR_MSG
+                )
+            );
         }
 
         /** @var NewsEntity $newsItem */
@@ -53,9 +75,20 @@ class NewsHandler implements NewsHandlerInterface
         return $newsItems;
     }
 
-    public function getNewsCount(array $criteria = []): int
+    public function getTotal(): int
     {
-        return $this->getRepository('ComponentBundle:NewsEntity')->findCount($criteria);
+        /** @var RepositoryInterface $newsRepository */
+        $newsRepository = $this->getRepository('ComponentBundle:NewsEntity');
+
+        return $newsRepository->findTotalByConditions($this->options);
+    }
+
+    /**
+     * @param int $offset
+     */
+    protected function setOffset(int $offset)
+    {
+        $this->offset = $offset;
     }
 
     /**

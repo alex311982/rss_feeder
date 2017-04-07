@@ -1,8 +1,24 @@
 services:
 
+    category.component:
+        class: ComponentBundle\Components\Category
+        arguments: ["@templating", "@router"]
+        calls:
+            - [setHandler, ['@category.handler']]
+
+    news.component:
+        class: ComponentBundle\Components\News
+        arguments: ["@templating", "@router"]
+        calls:
+            - [setHandler, ['@news.handler']]
+
+    alert.component:
+        class: ComponentBundle\Components\Alert
+        arguments: ["@templating"]
+
     news.handler:
         class: ComponentBundle\Handler\NewsHandler
-        arguments: ["@doctrine.orm.entity_manager", "%component.news.limit_frontend%"]
+        arguments: ["@doctrine.orm.entity_manager", "%component.news.limit_frontend%", "%component.news.offset%"]
 
     category.handler:
         class: ComponentBundle\Handler\CategoryHandler

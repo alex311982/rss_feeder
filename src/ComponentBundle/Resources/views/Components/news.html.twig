@@ -5,9 +5,11 @@
 </style>
 
 {% block javascripts_head %}
-    {% javascripts '@ComponentBundle/Resources/js/Components/news.js' %}
-        <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+    <script>
+        var ajaxUrlNews = '{{ ajax_url }}',
+            formatNews = '{{ format }}';
+    </script>
+    <script src="{{ asset('bundles/component/js/Components/news.js') }}"></script>
 {% endblock %}
 
 <div id='main_news' class="subscribers-categoryClick"></div>
