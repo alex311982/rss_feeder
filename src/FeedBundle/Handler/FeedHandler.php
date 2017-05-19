@@ -6,8 +6,8 @@ use ComponentBundle\Entity\CategoryEntity;
 use ComponentBundle\Entity\MediaEntity;
 use ComponentBundle\Entity\NewsEntity;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
 use FeedBundle\Exception\FeederException;
-use Doctrine\ORM\EntityManager;
 use FeedIo\Feed\Item;
 use FeedIo\Feed\ItemInterface;
 use FeedIo\FeedInterface;
@@ -21,7 +21,7 @@ class FeedHandler implements FeedHandlerInterface
      */
     protected $feedParser;
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     protected $em;
     /**
@@ -33,14 +33,15 @@ class FeedHandler implements FeedHandlerInterface
 
     public function __construct(
         FeedIo $feedParser,
-        EntityManager $em,
-        int $curlLimit
+        EntityManagerInterface $em,
+        int $curlLimit,
+        ArrayCollection $category
     )
     {
         $this->feedParser = $feedParser;
         $this->em = $em;
         $this->curlLimit = $curlLimit;
-        $this->persistedCategories = new ArrayCollection();
+        $this->persistedCategories = $category;
     }
 
     /**
