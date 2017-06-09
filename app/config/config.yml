@@ -75,6 +75,3 @@ component:
     news:
         per_frontend_request: 3
         news_offset: 0
-
-feed:
-    per_curl_request: 50

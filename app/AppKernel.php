@@ -20,7 +20,7 @@ class AppKernel extends Kernel
             new JMS\DiExtraBundle\JMSDiExtraBundle(),
             new JMS\AopBundle\JMSAopBundle(),
             new ComponentBundle\ComponentBundle(),
-            new FeedBundle\FeedBundle()
+            new Gubarev\Bundle\FeedBundle\FeedBundle()
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {

@@ -2,11 +2,11 @@
 
 namespace ComponentBundle\Handler;
 
-use ComponentBundle\Entity\NewsEntity;
+use ComponentBundle\Entity\ParserNewsEntity;
 use ComponentBundle\Exception\ComponentException;
 use ComponentBundle\Handler\Interfaces\HandlerInterfaces;
 use ComponentBundle\Repository\Interfaces\RepositoryInterface;
-use ComponentBundle\Repository\NewsEntityRepository;
+use ComponentBundle\Repository\ParserNewsEntityRepository;
 use Doctrine\ORM\EntityManager;
 
 class NewsHandler implements HandlerInterfaces
@@ -54,7 +54,7 @@ class NewsHandler implements HandlerInterfaces
     {
         $newsItems = [];
 
-        /** @var NewsEntityRepository $newsRepository */
+        /** @var ParserNewsEntityRepository $newsRepository */
         $newsRepository = $this->getRepository('ComponentBundle:NewsEntity');
 
         try {
@@ -67,7 +67,7 @@ class NewsHandler implements HandlerInterfaces
             );
         }
 
-        /** @var NewsEntity $newsItem */
+        /** @var ParserNewsEntity $newsItem */
         foreach($news as $newsItem) {
             array_push($newsItems, $newsItem->toArray());
         }

@@ -5,7 +5,7 @@ namespace ComponentBundle\Handler;
 use ComponentBundle\Entity\CategoryEntity;
 use ComponentBundle\Exception\ComponentException;
 use ComponentBundle\Handler\Interfaces\HandlerInterfaces;
-use ComponentBundle\Repository\CategoryEntityRepository;
+use ComponentBundle\Repository\ParserCategoryEntityRepository;
 use Doctrine\ORM\EntityManager;
 
 class CategoryHandler implements HandlerInterfaces
@@ -39,7 +39,7 @@ class CategoryHandler implements HandlerInterfaces
             return $this->categories;
         }
 
-        /** @var CategoryEntityRepository $categoryRepository */
+        /** @var ParserCategoryEntityRepository $categoryRepository */
         $categoryRepository = $this->getRepository('ComponentBundle:CategoryEntity');
 
         try {
@@ -58,7 +58,7 @@ class CategoryHandler implements HandlerInterfaces
 
     public function getTotal(): int
     {
-        /** @var CategoryEntityRepository $categoryRepository */
+        /** @var ParserCategoryEntityRepository $categoryRepository */
         $categoryRepository = $this->getRepository('ComponentBundle:CategoryEntity');
 
         return $categoryRepository->findTotalByConditions($this->options);

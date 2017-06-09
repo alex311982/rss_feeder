@@ -24,7 +24,8 @@
         "debril/rss-atom-bundle": "^3.0",
         "stof/doctrine-extensions-bundle": "^1.2",
         "jms/di-extra-bundle": "^1.8",
-        "jms/serializer": "^1.5"
+        "jms/serializer": "^1.5",
+        "gubarev/rss_feeder": "^1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
@@ -57,5 +58,11 @@
             "file": "app/config/parameters.yml"
         },
         "branch-alias": null
-    }
+    },
+    "repositories": [
+        {
+            "url": "https://github.com/alex311982/rss_parser.git",
+            "type": "git"
+        }
+    ]
 }
